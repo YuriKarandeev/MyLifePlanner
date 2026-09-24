@@ -43,9 +43,7 @@
     --shadow: 0 1px 3px rgba(0,0,0,.3);
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body {
-    overscroll-behavior-y: contain;
-  }
+  html, body { overscroll-behavior-y: contain; }
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -99,7 +97,7 @@
     border-color: var(--border);
     margin-bottom: -1px;
   }
-  main { padding: 16px; max-width: 1400px; margin: 0 auto; }
+  main { padding: 16px; max-width: 1400px; margin: 0 auto; padding-bottom: calc(16px + var(--safe-bottom)); }
   .view { display: none; }
   .view.active { display: block; }
 
@@ -126,7 +124,6 @@
   button.ghost:hover { background: var(--panel-2); }
   button.danger { background: var(--bad); }
   button.mini { padding: 4px 8px; font-size: 12px; }
-  button.icon-only { padding: 4px 7px; font-size: 13px; line-height: 1; }
 
   .theme-toggle {
     display: inline-flex;
@@ -164,6 +161,29 @@
     min-height: 40px;
   }
   input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+
+  /* Sync indicator */
+  .sync-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--muted);
+    padding: 4px 8px;
+    border-radius: 12px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+  }
+  .sync-badge .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: background .3s;
+  }
+  .sync-badge.online .dot { background: var(--ok); }
+  .sync-badge.syncing .dot { background: var(--warn); animation: pulse 1s infinite; }
+  .sync-badge.offline .dot { background: var(--bad); }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
 
   /* ===== KANBAN ===== */
   .kanban {
@@ -227,30 +247,6 @@
   }
   .card .badge.dj { color: var(--dj); border-color: var(--dj); }
   .card .badge.code { color: var(--code); border-color: var(--code); }
-  .card .actions {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    display: none;
-    gap: 4px;
-  }
-  .card:hover .actions { display: flex; }
-  .card .icon-btn {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    width: 26px;
-    height: 26px;
-    padding: 0;
-    border-radius: 6px;
-    font-size: 12px;
-    line-height: 1;
-    cursor: pointer;
-  }
-  .card .icon-btn:hover { color: var(--text); background: var(--panel); }
-  .column.drag-over { border-color: var(--accent); background: rgba(108,140,255,.06); }
-
-  /* кнопки перемещения карточки */
   .card .move-row {
     display: flex;
     justify-content: space-between;
@@ -288,6 +284,7 @@
     cursor: pointer;
   }
   .card .del-btn:hover { color: var(--bad); border-color: var(--bad); }
+  .column.drag-over { border-color: var(--accent); background: rgba(108,140,255,.06); }
 
   /* ===== CALENDAR ===== */
   .cal-head {
@@ -311,10 +308,7 @@
     font-size: 12px;
   }
   .cal-head .seg button.active { background: var(--accent); color: white; }
-  .cal-grid {
-    display: grid;
-    gap: 6px;
-  }
+  .cal-grid { display: grid; gap: 6px; }
   .cal-grid.week { grid-template-columns: repeat(7, 1fr); }
   .cal-grid.month { grid-template-columns: repeat(7, 1fr); }
   .cal-grid.year { grid-template-columns: repeat(4, 1fr); }
@@ -451,10 +445,7 @@
     gap: 4px;
     transition: .15s;
   }
-  .link-btn.has-link {
-    color: var(--accent);
-    border-color: var(--accent);
-  }
+  .link-btn.has-link { color: var(--accent); border-color: var(--accent); }
   .link-btn:hover { filter: brightness(1.15); }
 
   .stub {
@@ -487,11 +478,7 @@
     box-shadow: var(--shadow);
   }
   .day-card.today { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-  .day-card .date {
-    font-size: 12px;
-    color: var(--muted);
-    text-align: center;
-  }
+  .day-card .date { font-size: 12px; color: var(--muted); text-align: center; }
   .day-card.today .date { color: var(--accent); font-weight: 600; }
   .day-card .dow {
     font-size: 11px;
@@ -500,11 +487,7 @@
     text-transform: uppercase;
     letter-spacing: .5px;
   }
-  .state-btns {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-  }
+  .state-btns { display: flex; flex-direction: column; gap: 5px; }
   .state-btn {
     padding: 9px;
     border-radius: 7px;
@@ -538,7 +521,7 @@
   }
   .med-row .checkbox { width: 24px; height: 24px; font-size: 13px; }
 
-  /* ===== HEALTH CHART ===== */
+  /* ===== CHART ===== */
   .chart-panel {
     background: var(--panel);
     border: 1px solid var(--border);
@@ -622,9 +605,30 @@
   .modal input { width: 100%; margin-bottom: 14px; }
   .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
 
-  /* =========================================================
-     АДАПТАЦИЯ ПОД ПЛАНШЕТ (≤900px)
-     ========================================================= */
+  /* Loading overlay */
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+    z-index: 200;
+    transition: opacity .3s;
+  }
+  .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+  .loading-overlay .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* =========== АДАПТАЦИЯ =========== */
   @media (max-width: 900px) {
     .kanban {
       grid-template-columns: repeat(4, 260px);
@@ -643,60 +647,31 @@
     }
     .day-card { scroll-snap-align: center; }
   }
-
-  /* =========================================================
-     АДАПТАЦИЯ ПОД ТЕЛЕФОН (≤640px)
-     ========================================================= */
   @media (max-width: 640px) {
-    header {
-      gap: 8px;
-      padding: calc(8px + var(--safe-top)) 12px 8px;
-    }
+    header { gap: 8px; padding: calc(8px + var(--safe-top)) 12px 8px; }
     header h1 { font-size: 14px; }
     .theme-toggle .opt { padding: 5px 8px; font-size: 11px; }
     .header-actions button { padding: 6px 10px; font-size: 12px; }
-
     main { padding: 12px 12px calc(12px + var(--safe-bottom)); }
-
     .tabs { padding: 6px 8px 0; }
     .tab { padding: 10px 12px; font-size: 13px; }
-
-    /* Канбан — горизонтальный скролл */
-    .kanban {
-      grid-template-columns: repeat(4, 82vw);
-      gap: 10px;
-    }
+    .kanban { grid-template-columns: repeat(4, 82vw); gap: 10px; }
     .column { min-height: 160px; padding: 10px; }
-
-    /* Карточка — кнопки внизу всегда видимы */
-    .card .actions { display: none; }
     .card { cursor: default; }
-
-    /* Здоровье — карточка на 70vw, скролл по центру */
-    .health-grid {
-      grid-template-columns: repeat(7, 70vw);
-      gap: 10px;
-    }
+    .health-grid { grid-template-columns: repeat(7, 70vw); gap: 10px; }
     .day-card { min-height: 260px; }
-
-    /* Календарь компактнее */
     .cal-grid { gap: 4px; }
     .cal-cell { min-height: 64px; padding: 4px; font-size: 10px; }
     .cal-cell .daynum { font-size: 10px; margin-bottom: 3px; }
     .cal-task { font-size: 9px; padding: 1px 4px; }
     .cal-grid.year .cal-cell { min-height: 52px; }
-
-    /* Увлечения — таблицы в карточки */
     .subtabs.sections { gap: 4px; }
     .subtab { padding: 7px 10px; font-size: 12px; }
     .subtab.section { padding: 6px 10px; font-size: 11px; }
-
     .hobby-form { gap: 6px; }
     .hobby-form input[type=text] { min-width: 100%; }
     .hobby-form input[type=date] { flex: 1; }
     .hobby-form button { flex-shrink: 0; }
-
-    /* Таблицы → stacked */
     table, thead, tbody, tr, td { display: block; }
     thead { display: none; }
     table { border: none; background: transparent; box-shadow: none; border-radius: 0; }
@@ -709,40 +684,23 @@
       box-shadow: var(--shadow);
       display: grid;
       grid-template-columns: 1fr auto;
-      grid-template-areas:
-        "main main"
-        "meta actions";
+      grid-template-areas: "main main" "meta actions";
       gap: 8px;
       align-items: center;
     }
     td { padding: 0; border: none; font-size: 13px; }
-
-    /* каждая ячейка — назначение через nth-child */
-    td:nth-child(1) { grid-area: main; } /* обычно title или № */
+    td:nth-child(1) { grid-area: main; }
     td:nth-child(2) { grid-area: meta; color: var(--muted); font-size: 12px; }
     td:nth-child(n+3) { grid-area: actions; display: flex; gap: 8px; justify-content: flex-end; align-items: center; }
     td.num-cell { grid-area: main; font-size: 11px; color: var(--muted); }
     td.actions-cell { grid-area: actions; }
-
-    /* Специфика задач: title / deadline / checkbox / delete */
-    /* Строка задачи: 4 ячейки */
-    /* 1=title, 2=deadline, 3=done-cell, 4=actions */
-    /* уже разложено выше */
     td.done-cell { grid-area: actions; text-align: right; }
-
-    /* Заголовок задачи первым, deadline второй строкой */
     tr td:nth-child(1) { font-weight: 500; }
-
-    /* Модалка */
     .modal { padding: 16px; }
-
-    /* График меньше */
     .chart-panel { padding: 12px; }
     .chart-head h3 { font-size: 13px; }
     .chart-head .seg button { padding: 6px 10px; font-size: 11px; }
   }
-
-  /* Очень маленькие телефоны */
   @media (max-width: 380px) {
     .kanban { grid-template-columns: repeat(4, 88vw); }
     .health-grid { grid-template-columns: repeat(7, 78vw); }
@@ -751,17 +709,23 @@
 </head>
 <body>
 
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div style="color:var(--muted);font-size:13px;">Загружаю данные...</div>
+</div>
+
 <header>
   <h1>🎯 Хобби и Здоровье</h1>
   <div class="spacer"></div>
   <div class="header-actions">
+    <span class="sync-badge" id="syncBadge" title="Статус синхронизации">
+      <span class="dot"></span>
+      <span id="syncText">—</span>
+    </span>
     <div class="theme-toggle" id="themeToggle">
       <div class="opt" data-theme="light">☀️</div>
       <div class="opt active" data-theme="dark">🌙</div>
     </div>
-    <button class="ghost mini" onclick="exportData()" title="Экспорт">⬇</button>
-    <button class="ghost mini" onclick="document.getElementById('importFile').click()" title="Импорт">⬆</button>
-    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
   </div>
 </header>
 
@@ -773,7 +737,6 @@
 </div>
 
 <main>
-  <!-- KANBAN -->
   <section class="view" id="view-kanban">
     <div style="margin-bottom:14px;">
       <button onclick="addKanbanCard()">+ Карточка (только Канбан)</button>
@@ -781,7 +744,6 @@
     <div class="kanban" id="kanban"></div>
   </section>
 
-  <!-- CALENDAR -->
   <section class="view" id="view-calendar">
     <div class="cal-head">
       <div class="seg" id="calSeg">
@@ -798,7 +760,6 @@
     <div class="cal-grid week" id="calGrid"></div>
   </section>
 
-  <!-- HOBBIES -->
   <section class="view" id="view-hobbies">
     <div class="subtabs" id="subtabs">
       <div class="subtab active dj" data-hobby="dj">🎧 Диджеинг</div>
@@ -808,10 +769,8 @@
     <div id="sectionBody"></div>
   </section>
 
-  <!-- HEALTH -->
   <section class="view active" id="view-health">
     <div class="health-grid" id="healthGrid"></div>
-
     <div class="chart-panel">
       <div class="chart-head">
         <h3>📈 Динамика состояния</h3>
@@ -834,7 +793,6 @@
   </section>
 </main>
 
-<!-- MODAL -->
 <div class="modal-overlay" id="linkModal">
   <div class="modal">
     <h3 id="linkModalTitle">Вставить ссылку</h3>
@@ -846,7 +804,153 @@
   </div>
 </div>
 
-<script>
+<!-- ============================================================
+     FIREBASE + ПРИЛОЖЕНИЕ
+     ============================================================ -->
+<script type="module">
+/* ============================================================
+   FIREBASE CONFIG
+   ============================================================ */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {
+  getFirestore, doc, getDoc, setDoc, onSnapshot,
+  enableIndexedDbPersistence
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCEI7MfHWtP7JDIodZnLU2hf7A5BK5M8k0",
+  authDomain: "mylifeplanner-98a49.firebaseapp.com",
+  projectId: "mylifeplanner-98a49",
+  storageBucket: "mylifeplanner-98a49.firebasestorage.app",
+  messagingSenderId: "367632220010",
+  appId: "1:367632220010:web:f37e7c5b812372ed38ef13"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Включаем офлайн-кэш (работает без интернета)
+enableIndexedDbPersistence(db).catch(err => {
+  if (err.code === 'failed-precondition') {
+    console.warn('Firestore persistence: несколько вкладок открыто');
+  } else if (err.code === 'unimplemented') {
+    console.warn('Firestore persistence: браузер не поддерживает');
+  }
+});
+
+// Ключ документа — «секретный ID». Если хочешь, можешь поменять на свой.
+const USER_ID = 'yuri-main';
+const DOC_PATH = ['users', USER_ID, 'main'];
+
+/* ============================================================
+   СОСТОЯНИЕ
+   ============================================================ */
+const STORAGE_KEY = 'hobbies_health_mvp_v2';
+const THEME_KEY = 'hobbies_health_theme_v2';
+
+const DEFAULT_STATE = {
+  tasks: [],
+  kanbanCards: [],
+  health: {},
+  works: [],
+  programs: [],
+  activeHobby: 'dj',
+  activeSection: { dj: 'tasks', code: 'tasks' }
+};
+
+let state = loadLocal();
+let theme = localStorage.getItem(THEME_KEY) || 'dark';
+let cloudReady = false;
+let saveTimer = null;
+
+function loadLocal() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return structuredClone(DEFAULT_STATE);
+    const parsed = JSON.parse(raw);
+    const merged = { ...structuredClone(DEFAULT_STATE), ...parsed };
+    if (!merged.activeSection) merged.activeSection = { dj: 'tasks', code: 'tasks' };
+    if (!merged.works) merged.works = [];
+    if (!merged.programs) merged.programs = [];
+    return merged;
+  } catch (e) {
+    return structuredClone(DEFAULT_STATE);
+  }
+}
+
+function saveLocal() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+// Сохранение: локально сразу, в облако — с небольшой задержкой (чтобы не спамить)
+function saveState() {
+  saveLocal();
+  if (!cloudReady) return;
+  clearTimeout(saveTimer);
+  setSyncStatus('syncing', 'Сохраняю...');
+  saveTimer = setTimeout(async () => {
+    try {
+      await setDoc(doc(db, ...DOC_PATH), state, { merge: false });
+      setSyncStatus('online', 'Синхронизировано');
+    } catch (e) {
+      console.error('Ошибка сохранения:', e);
+      setSyncStatus('offline', 'Офлайн');
+    }
+  }, 600);
+}
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+
+/* ============================================================
+   SYNC СТАТУС
+   ============================================================ */
+function setSyncStatus(status, text) {
+  const badge = document.getElementById('syncBadge');
+  const textEl = document.getElementById('syncText');
+  if (!badge || !textEl) return;
+  badge.classList.remove('online', 'syncing', 'offline');
+  badge.classList.add(status);
+  textEl.textContent = text;
+}
+
+/* ============================================================
+   FIREBASE: загрузка и real-time синхронизация
+   ============================================================ */
+const docRef = doc(db, ...DOC_PATH);
+
+onSnapshot(docRef, { includeMetadataChanges: false }, snapshot => {
+  const loading = document.getElementById('loadingOverlay');
+  if (snapshot.exists()) {
+    const cloudData = snapshot.data();
+    // Объединяем с дефолтом (если структура обновилась)
+    state = { ...structuredClone(DEFAULT_STATE), ...cloudData };
+    if (!state.activeSection) state.activeSection = { dj: 'tasks', code: 'tasks' };
+    if (!state.works) state.works = [];
+    if (!state.programs) state.programs = [];
+    saveLocal();
+    cloudReady = true;
+    setSyncStatus('online', 'Синхронизировано');
+    renderAll();
+  } else {
+    // Первый запуск — документа нет. Загружаем локальное состояние в облако.
+    cloudReady = true;
+    setDoc(docRef, state).then(() => {
+      setSyncStatus('online', 'Создано');
+    }).catch(e => {
+      console.error('Ошибка создания документа:', e);
+      setSyncStatus('offline', 'Офлайн');
+    });
+    renderAll();
+  }
+  if (loading) loading.classList.add('hidden');
+}, err => {
+  console.error('Snapshot error:', err);
+  setSyncStatus('offline', 'Нет связи');
+  const loading = document.getElementById('loadingOverlay');
+  if (loading) loading.classList.add('hidden');
+  renderAll();
+});
+
 /* ============================================================
    МОБИЛЬНЫЙ ПОРЯДОК ВКЛАДОК
    ============================================================ */
@@ -854,7 +958,6 @@ function applyMobileTabOrder() {
   const isMobile = window.matchMedia('(max-width: 640px)').matches;
   const tabsEl = document.getElementById('mainTabs');
   const tabs = [...tabsEl.querySelectorAll('.tab')];
-  // порядок для мобилы: health, kanban, calendar, hobbies
   const mobileOrder = ['health', 'kanban', 'calendar', 'hobbies'];
   const desktopOrder = ['kanban', 'calendar', 'hobbies', 'health'];
   const order = isMobile ? mobileOrder : desktopOrder;
@@ -868,43 +971,6 @@ window.addEventListener('resize', () => {
   clearTimeout(window._orderTimer);
   window._orderTimer = setTimeout(applyMobileTabOrder, 150);
 });
-
-/* ============================================================
-   СОСТОЯНИЕ
-   ============================================================ */
-const STORAGE_KEY = 'hobbies_health_mvp_v1';
-const THEME_KEY = 'hobbies_health_theme_v1';
-
-const DEFAULT_STATE = {
-  tasks: [],
-  kanbanCards: [],
-  health: {},
-  works: [],
-  programs: [],
-  activeHobby: 'dj',
-  activeSection: { dj: 'tasks', code: 'tasks' }
-};
-
-let state = loadState();
-let theme = localStorage.getItem(THEME_KEY) || 'dark';
-
-function loadState() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return structuredClone(DEFAULT_STATE);
-    const parsed = JSON.parse(raw);
-    const merged = { ...structuredClone(DEFAULT_STATE), ...parsed };
-    if (!merged.activeSection) merged.activeSection = { dj: 'tasks', code: 'tasks' };
-    if (!merged.works) merged.works = [];
-    if (!merged.programs) merged.programs = [];
-    return merged;
-  } catch (e) {
-    console.error('Ошибка загрузки', e);
-    return structuredClone(DEFAULT_STATE);
-  }
-}
-function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
 
 /* ============================================================
    ТЕМА
@@ -927,7 +993,7 @@ document.querySelectorAll('#themeToggle .opt').forEach(o => {
 });
 
 /* ============================================================
-   УТИЛИТЫ ДАТ
+   ДАТЫ
    ============================================================ */
 function todayISO() { return toISO(new Date()); }
 function toISO(d) {
@@ -1019,10 +1085,10 @@ function renderCard(card, colIdx) {
     <div class="meta">${metaHtml}</div>
     <div class="move-row">
       <div class="move-btns">
-        <button class="move-btn" ${canLeft ? '' : 'disabled'} title="Влево" onclick="moveCardBy('${card.id}', -1)">←</button>
-        <button class="move-btn" ${canRight ? '' : 'disabled'} title="Вправо" onclick="moveCardBy('${card.id}', 1)">→</button>
+        <button class="move-btn" ${canLeft ? '' : 'disabled'} title="Влево" onclick="window.moveCardBy('${card.id}', -1)">←</button>
+        <button class="move-btn" ${canRight ? '' : 'disabled'} title="Вправо" onclick="window.moveCardBy('${card.id}', 1)">→</button>
       </div>
-      <button class="del-btn" title="Удалить" onclick="deleteCard('${card.id}')">🗑</button>
+      <button class="del-btn" title="Удалить" onclick="window.deleteCard('${card.id}')">🗑</button>
     </div>
   `;
 
@@ -1109,12 +1175,10 @@ function renderHobbies() {
   document.querySelectorAll('#subtabs .subtab').forEach(st => {
     st.classList.toggle('active', st.dataset.hobby === state.activeHobby);
   });
-
   const tabsEl = document.getElementById('sectionTabs');
   tabsEl.innerHTML = '';
   const sections = SECTIONS[state.activeHobby];
   const activeSec = state.activeSection[state.activeHobby] || sections[0].id;
-
   sections.forEach(s => {
     const el = document.createElement('div');
     el.className = 'subtab section' + (s.id === activeSec ? ' active' : '');
@@ -1126,10 +1190,8 @@ function renderHobbies() {
     });
     tabsEl.appendChild(el);
   });
-
   const body = document.getElementById('sectionBody');
   body.innerHTML = '';
-
   if (activeSec === 'tasks') {
     renderTasksSection(body);
   } else if (activeSec === 'learning' || activeSec === 'collection') {
@@ -1148,7 +1210,7 @@ function renderTasksSection(container) {
     <div class="hobby-form">
       <input type="text" id="hobbyTaskText" placeholder="Новая задача...">
       <input type="date" id="hobbyTaskDate">
-      <button onclick="addHobbyTask()">Добавить</button>
+      <button onclick="window.addHobbyTask()">Добавить</button>
     </div>
     <table>
       <thead>
@@ -1177,9 +1239,9 @@ function renderTasksSection(container) {
         <td>${escapeHtml(task.title)}</td>
         <td>${task.deadline ? formatRu(task.deadline) : '—'}</td>
         <td class="done-cell">
-          <div class="checkbox ${task.done ? 'checked' : ''}" onclick="toggleTaskDone('${task.id}')">${task.done ? '✓' : ''}</div>
+          <div class="checkbox ${task.done ? 'checked' : ''}" onclick="window.toggleTaskDone('${task.id}')">${task.done ? '✓' : ''}</div>
         </td>
-        <td class="actions-cell"><button class="ghost mini" onclick="deleteTask('${task.id}')">🗑</button></td>
+        <td class="actions-cell"><button class="ghost mini" onclick="window.deleteTask('${task.id}')">🗑</button></td>
       `;
       tbody.appendChild(tr);
     });
@@ -1225,7 +1287,7 @@ function renderWorksSection(container) {
     <div class="hobby-form">
       <input type="text" id="workTitle" placeholder="Название работы...">
       <input type="date" id="workDate">
-      <button onclick="addWork()">Добавить</button>
+      <button onclick="window.addWork()">Добавить</button>
     </div>
     <table>
       <thead>
@@ -1259,7 +1321,7 @@ function renderWorksRows() {
       <td>${escapeHtml(w.title)}</td>
       <td>${w.date ? formatRu(w.date) : '—'}</td>
       <td style="text-align:center;">${renderLinkButton(w.id, 'work', w.url)}</td>
-      <td class="actions-cell"><button class="ghost mini" onclick="deleteWork('${w.id}')">🗑</button></td>
+      <td class="actions-cell"><button class="ghost mini" onclick="window.deleteWork('${w.id}')">🗑</button></td>
     `;
     tbody.appendChild(tr);
   });
@@ -1288,7 +1350,7 @@ function renderProgramsSection(container, done) {
   container.innerHTML = `
     <div class="hobby-form">
       <input type="text" id="progTitle" placeholder="Название программы...">
-      <button onclick="addProgram(${done})">Добавить</button>
+      <button onclick="window.addProgram(${done})">Добавить</button>
     </div>
     <table>
       <thead>
@@ -1322,11 +1384,11 @@ function renderProgramsRows(done) {
       <td>${escapeHtml(p.title)}</td>
       <td style="text-align:center;">${renderLinkButton(p.id, 'program', p.url)}</td>
       <td style="text-align:center;">
-        <button class="ghost mini" onclick="toggleProgramDone('${p.id}')">
+        <button class="ghost mini" onclick="window.toggleProgramDone('${p.id}')">
           ${p.done ? '↩ Вернуть' : '✓ Завершить'}
         </button>
       </td>
-      <td class="actions-cell"><button class="ghost mini" onclick="deleteProgram('${p.id}')">🗑</button></td>
+      <td class="actions-cell"><button class="ghost mini" onclick="window.deleteProgram('${p.id}')">🗑</button></td>
     `;
     tbody.appendChild(tr);
   });
@@ -1368,7 +1430,7 @@ function renderLinkButton(entityId, entityType, url) {
   if (hasLink) {
     return `<a class="link-btn has-link" href="${safeUrl}" target="_blank" rel="noopener" title="${safeUrl}">🔗</a>`;
   }
-  return `<button class="link-btn" title="Добавить ссылку" onclick="openLinkModal('${entityId}', '${entityType}')">🔗</button>`;
+  return `<button class="link-btn" title="Добавить ссылку" onclick="window.openLinkModal('${entityId}', '${entityType}')">🔗</button>`;
 }
 
 function openLinkModal(entityId, entityType) {
@@ -1449,13 +1511,11 @@ function renderCalendar() {
   grid.className = 'cal-grid ' + calRange;
   grid.innerHTML = '';
   const today = todayISO();
-
   const map = {};
   state.tasks.forEach(t => {
     if (!t.deadline) return;
     (map[t.deadline] = map[t.deadline] || []).push(t);
   });
-
   if (calRange === 'week') {
     const base = fromISO(calAnchor);
     const dow = base.getDay();
@@ -1532,7 +1592,6 @@ function renderHealth() {
   const grid = document.getElementById('healthGrid');
   grid.innerHTML = '';
   const today = todayISO();
-
   for (let i = -3; i <= 3; i++) {
     const iso = addDays(today, i);
     const d = fromISO(iso);
@@ -1547,26 +1606,24 @@ function renderHealth() {
         ${HEALTH_STATES.map(s => `
           <div class="state-btn ${rec.state === s.id ? 'active' : ''}"
                data-state="${s.id}"
-               onclick="setHealthState('${iso}', '${s.id}')">${s.label}</div>
+               onclick="window.setHealthState('${iso}', '${s.id}')">${s.label}</div>
         `).join('')}
       </div>
       <div class="meds">
         <div class="med-row">
           <span>💊 Утро</span>
           <div class="checkbox ${rec.medMorning ? 'checked' : ''}"
-               onclick="toggleMed('${iso}', 'medMorning')">${rec.medMorning ? '✓' : ''}</div>
+               onclick="window.toggleMed('${iso}', 'medMorning')">${rec.medMorning ? '✓' : ''}</div>
         </div>
         <div class="med-row">
           <span>💊 Вечер</span>
           <div class="checkbox ${rec.medEvening ? 'checked' : ''}"
-               onclick="toggleMed('${iso}', 'medEvening')">${rec.medEvening ? '✓' : ''}</div>
+               onclick="window.toggleMed('${iso}', 'medEvening')">${rec.medEvening ? '✓' : ''}</div>
         </div>
       </div>
     `;
     grid.appendChild(card);
   }
-
-  // центрируем "сегодня" при первой отрисовке на мобиле
   if (window.matchMedia('(max-width: 900px)').matches) {
     requestAnimationFrame(() => {
       const todayCard = grid.querySelector('.day-card.today');
@@ -1760,39 +1817,6 @@ window.addEventListener('resize', () => {
 });
 
 /* ============================================================
-   ЭКСПОРТ / ИМПОРТ
-   ============================================================ */
-function exportData() {
-  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `hobbies-backup-${todayISO()}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function importData(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try {
-      const data = JSON.parse(ev.target.result);
-      if (!confirm('Импорт заменит текущие данные. Продолжить?')) return;
-      state = { ...structuredClone(DEFAULT_STATE), ...data };
-      if (!state.activeSection) state.activeSection = { dj: 'tasks', code: 'tasks' };
-      saveState();
-      renderAll();
-    } catch (err) {
-      alert('Ошибка чтения файла: ' + err.message);
-    }
-  };
-  reader.readAsText(file);
-  e.target.value = '';
-}
-
-/* ============================================================
    УТИЛИТЫ
    ============================================================ */
 function escapeHtml(s) {
@@ -1802,91 +1826,7 @@ function escapeHtml(s) {
 }
 
 /* ============================================================
-   PWA: манифест + service worker (inline)
-   ============================================================ */
-function setupPWA() {
-  // 1. Манифест через Blob
-  try {
-    const manifest = {
-      name: "Хобби и Здоровье",
-      short_name: "Хобби",
-      start_url: ".",
-      display: "standalone",
-      background_color: theme === 'dark' ? '#0f1117' : '#f5f6fa',
-      theme_color: theme === 'dark' ? '#0f1117' : '#f5f6fa',
-      orientation: "portrait",
-      icons: [
-        {
-          src: generateIconDataURL(),
-          sizes: "192x192",
-          type: "image/png",
-          purpose: "any maskable"
-        },
-        {
-          src: generateIconDataURL(),
-          sizes: "512x512",
-          type: "image/png",
-          purpose: "any maskable"
-        }
-      ]
-    };
-    const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
-    const manifestURL = URL.createObjectURL(manifestBlob);
-    const link = document.createElement('link');
-    link.rel = 'manifest';
-    link.href = manifestURL;
-    document.head.appendChild(link);
-  } catch (e) { console.warn('PWA manifest failed', e); }
-
-  // 2. Service worker через Blob (работает только на http/https)
-  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-    try {
-      const swCode = `
-        self.addEventListener('install', e => { self.skipWaiting(); });
-        self.addEventListener('activate', e => { self.clients.claim(); });
-        self.addEventListener('fetch', e => {
-          e.respondWith(
-            caches.open('hobby-v1').then(cache =>
-              fetch(e.request).then(res => {
-                if (e.request.method === 'GET' && res.status === 200) {
-                  cache.put(e.request, res.clone());
-                }
-                return res;
-              }).catch(() => cache.match(e.request))
-            )
-          );
-        });
-      `;
-      const swBlob = new Blob([swCode], { type: 'application/javascript' });
-      const swURL = URL.createObjectURL(swBlob);
-      navigator.serviceWorker.register(swURL).catch(err => {
-        console.warn('SW registration failed (это ок для file://):', err.message);
-      });
-    } catch (e) { console.warn('SW setup failed', e); }
-  }
-}
-
-function generateIconDataURL() {
-  // рисуем иконку на canvas и возвращаем data URL
-  const c = document.createElement('canvas');
-  c.width = 512; c.height = 512;
-  const ctx = c.getContext('2d');
-  // фон
-  const grad = ctx.createLinearGradient(0, 0, 512, 512);
-  grad.addColorStop(0, '#6c8cff');
-  grad.addColorStop(1, '#c06cff');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 512, 512);
-  // символ 🎯
-  ctx.font = '300px -apple-system, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('🎯', 256, 280);
-  return c.toDataURL('image/png');
-}
-
-/* ============================================================
-   СТАРТ
+   РЕНДЕР
    ============================================================ */
 function renderAll() {
   renderKanban();
@@ -1895,9 +1835,37 @@ function renderAll() {
   renderHealth();
   drawHealthChart();
 }
+
+/* ============================================================
+   ЭКСПОРТ В ГЛОБАЛЬНУЮ ОБЛАСТЬ (для onclick в HTML)
+   ============================================================ */
+window.moveCardBy = moveCardBy;
+window.deleteCard = deleteCard;
+window.addKanbanCard = addKanbanCard;
+window.addHobbyTask = addHobbyTask;
+window.toggleTaskDone = toggleTaskDone;
+window.deleteTask = deleteTask;
+window.addWork = addWork;
+window.deleteWork = deleteWork;
+window.addProgram = addProgram;
+window.toggleProgramDone = toggleProgramDone;
+window.deleteProgram = deleteProgram;
+window.openLinkModal = openLinkModal;
+window.closeLinkModal = closeLinkModal;
+window.saveLinkModal = saveLinkModal;
+window.setHealthState = setHealthState;
+window.toggleMed = toggleMed;
+window.calShift = calShift;
+window.calToday = calToday;
+
+/* ============================================================
+   СТАРТ
+   ============================================================ */
 applyTheme(theme);
+// Первый рендер — из локального кэша, пока идёт загрузка из Firebase
 renderAll();
-setupPWA();
+setSyncStatus('syncing', 'Подключаюсь...');
 </script>
+
 </body>
 </html>
