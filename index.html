@@ -2,7 +2,11 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Хобби и Здоровье">
 <title>Мои увлечения и здоровье</title>
 <style>
   :root {
@@ -20,6 +24,8 @@
     --bad: #e0455f;
     --shadow: 0 1px 3px rgba(0,0,0,.06);
     --radius: 10px;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
   html[data-theme="dark"] {
     --bg: #0f1117;
@@ -36,7 +42,10 @@
     --bad: #ff5c7c;
     --shadow: 0 1px 3px rgba(0,0,0,.3);
   }
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    overscroll-behavior-y: contain;
+  }
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -44,12 +53,13 @@
     color: var(--text);
     font-size: 14px;
     transition: background .2s, color .2s;
+    -webkit-font-smoothing: antialiased;
   }
   header {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 14px 20px;
+    gap: 12px;
+    padding: calc(10px + var(--safe-top)) 16px 10px;
     border-bottom: 1px solid var(--border);
     background: var(--panel);
     position: sticky;
@@ -57,18 +67,21 @@
     z-index: 10;
     flex-wrap: wrap;
   }
-  header h1 { font-size: 16px; margin: 0; font-weight: 600; }
+  header h1 { font-size: 15px; margin: 0; font-weight: 600; white-space: nowrap; }
   header .spacer { flex: 1; }
   .tabs {
     display: flex;
     gap: 4px;
-    padding: 10px 20px 0;
+    padding: 8px 12px 0;
     background: var(--panel);
     border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
   }
+  .tabs::-webkit-scrollbar { display: none; }
   .tab {
-    padding: 9px 16px;
+    padding: 10px 14px;
     cursor: pointer;
     border-radius: 8px 8px 0 0;
     color: var(--muted);
@@ -76,6 +89,8 @@
     border: 1px solid transparent;
     border-bottom: none;
     user-select: none;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .tab:hover { color: var(--text); }
   .tab.active {
@@ -84,7 +99,7 @@
     border-color: var(--border);
     margin-bottom: -1px;
   }
-  main { padding: 20px; max-width: 1400px; margin: 0 auto; }
+  main { padding: 16px; max-width: 1400px; margin: 0 auto; }
   .view { display: none; }
   .view.active { display: block; }
 
@@ -97,8 +112,11 @@
     cursor: pointer;
     font-size: 13px;
     font-weight: 500;
-    transition: filter .15s;
+    transition: filter .15s, transform .05s;
+    user-select: none;
+    font-family: inherit;
   }
+  button:active { transform: scale(.97); }
   button:hover { filter: brightness(1.08); }
   button.ghost {
     background: transparent;
@@ -121,7 +139,7 @@
     user-select: none;
   }
   .theme-toggle .opt {
-    padding: 5px 12px;
+    padding: 5px 10px;
     border-radius: 20px;
     font-size: 12px;
     color: var(--muted);
@@ -138,11 +156,12 @@
     background: var(--panel-2);
     border: 1px solid var(--border);
     color: var(--text);
-    padding: 8px 10px;
+    padding: 10px 12px;
     border-radius: 8px;
-    font-size: 13px;
+    font-size: 15px;
     font-family: inherit;
     outline: none;
+    min-height: 40px;
   }
   input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 
@@ -185,6 +204,7 @@
     margin-bottom: 8px;
     cursor: grab;
     position: relative;
+    user-select: none;
   }
   .card.hobby-dj { border-left-color: var(--dj); }
   .card.hobby-code { border-left-color: var(--code); }
@@ -219,8 +239,8 @@
     background: var(--bg);
     border: 1px solid var(--border);
     color: var(--muted);
-    width: 22px;
-    height: 22px;
+    width: 26px;
+    height: 26px;
     padding: 0;
     border-radius: 6px;
     font-size: 12px;
@@ -230,12 +250,51 @@
   .card .icon-btn:hover { color: var(--text); background: var(--panel); }
   .column.drag-over { border-color: var(--accent); background: rgba(108,140,255,.06); }
 
+  /* кнопки перемещения карточки */
+  .card .move-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+  }
+  .card .move-btns { display: flex; gap: 4px; }
+  .card .move-btn {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .card .move-btn:hover { color: var(--text); border-color: var(--accent); }
+  .card .move-btn:disabled { opacity: .3; cursor: default; }
+  .card .move-btn:disabled:hover { color: var(--muted); border-color: var(--border); }
+  .card .del-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--muted);
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .card .del-btn:hover { color: var(--bad); border-color: var(--bad); }
+
   /* ===== CALENDAR ===== */
   .cal-head {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     flex-wrap: wrap;
   }
   .cal-head .seg {
@@ -248,12 +307,13 @@
     background: transparent;
     color: var(--muted);
     border-radius: 0;
-    padding: 7px 14px;
+    padding: 7px 12px;
+    font-size: 12px;
   }
   .cal-head .seg button.active { background: var(--accent); color: white; }
   .cal-grid {
     display: grid;
-    gap: 8px;
+    gap: 6px;
   }
   .cal-grid.week { grid-template-columns: repeat(7, 1fr); }
   .cal-grid.month { grid-template-columns: repeat(7, 1fr); }
@@ -262,23 +322,24 @@
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 8px;
-    min-height: 90px;
+    padding: 6px;
+    min-height: 84px;
     font-size: 12px;
     box-shadow: var(--shadow);
+    overflow: hidden;
   }
   .cal-cell.other { opacity: .45; }
   .cal-cell.today { border-color: var(--accent); }
-  .cal-cell .daynum { color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+  .cal-cell .daynum { color: var(--muted); font-weight: 600; margin-bottom: 4px; font-size: 11px; }
   .cal-cell.today .daynum { color: var(--accent); }
   .cal-grid.year .cal-cell { min-height: 70px; }
   .cal-task {
     background: var(--panel-2);
     border-left: 2px solid var(--accent);
-    padding: 2px 6px;
+    padding: 2px 5px;
     border-radius: 4px;
-    margin-bottom: 3px;
-    font-size: 11px;
+    margin-bottom: 2px;
+    font-size: 10px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -301,7 +362,7 @@
     border-bottom: 1px dashed var(--border);
   }
   .subtab {
-    padding: 8px 16px;
+    padding: 9px 14px;
     border-radius: 8px;
     cursor: pointer;
     color: var(--muted);
@@ -309,6 +370,7 @@
     background: var(--panel);
     user-select: none;
     font-size: 13px;
+    white-space: nowrap;
   }
   .subtab.active { background: var(--panel-2); color: var(--text); }
   .subtab.active.dj { color: var(--dj); border-color: var(--dj); }
@@ -320,9 +382,8 @@
   }
   .subtab.section.active {
     background: var(--panel-2);
-    color: var(--text);
-    border-color: var(--accent);
     color: var(--accent);
+    border-color: var(--accent);
   }
   .hobby-form {
     display: flex;
@@ -330,7 +391,7 @@
     margin-bottom: 16px;
     flex-wrap: wrap;
   }
-  .hobby-form input[type=text] { flex: 1; min-width: 200px; }
+  .hobby-form input[type=text] { flex: 1; min-width: 180px; }
   table {
     width: 100%;
     border-collapse: collapse;
@@ -352,8 +413,8 @@
   td.num-cell { width: 48px; color: var(--muted); }
   td.actions-cell { width: 60px; text-align: right; }
   .checkbox {
-    width: 22px;
-    height: 22px;
+    width: 26px;
+    height: 26px;
     border: 2px solid var(--border);
     border-radius: 6px;
     display: inline-flex;
@@ -361,7 +422,7 @@
     justify-content: center;
     cursor: pointer;
     background: var(--panel-2);
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1;
     user-select: none;
     transition: .15s;
@@ -379,9 +440,9 @@
     background: transparent;
     border: 1px solid var(--border);
     color: var(--muted);
-    padding: 3px 8px;
+    padding: 5px 10px;
     border-radius: 6px;
-    font-size: 13px;
+    font-size: 14px;
     cursor: pointer;
     line-height: 1;
     text-decoration: none;
@@ -400,7 +461,7 @@
     background: var(--panel);
     border: 1px dashed var(--border);
     border-radius: var(--radius);
-    padding: 60px 20px;
+    padding: 50px 20px;
     text-align: center;
     color: var(--muted);
     font-size: 14px;
@@ -421,7 +482,7 @@
     padding: 12px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     min-height: 240px;
     box-shadow: var(--shadow);
   }
@@ -445,7 +506,7 @@
     gap: 5px;
   }
   .state-btn {
-    padding: 7px;
+    padding: 9px;
     border-radius: 7px;
     border: 1px solid var(--border);
     background: var(--panel-2);
@@ -454,6 +515,7 @@
     font-size: 12px;
     text-align: center;
     transition: .15s;
+    user-select: none;
   }
   .state-btn:hover { color: var(--text); }
   .state-btn.active[data-state=ok]   { background: rgba(34,165,90,.15); color: var(--ok);   border-color: var(--ok); }
@@ -474,14 +536,14 @@
     font-size: 12px;
     color: var(--muted);
   }
-  .med-row .checkbox { width: 20px; height: 20px; font-size: 12px; }
+  .med-row .checkbox { width: 24px; height: 24px; font-size: 13px; }
 
   /* ===== HEALTH CHART ===== */
   .chart-panel {
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 16px;
+    padding: 14px;
     box-shadow: var(--shadow);
   }
   .chart-head {
@@ -503,14 +565,15 @@
     background: transparent;
     color: var(--muted);
     border-radius: 0;
-    padding: 7px 14px;
+    padding: 7px 12px;
+    font-size: 12px;
   }
   .chart-head .seg button.active { background: var(--accent); color: #fff; }
   .chart-wrap { position: relative; width: 100%; }
   canvas { width: 100%; display: block; }
   .chart-legend {
     display: flex;
-    gap: 16px;
+    gap: 14px;
     font-size: 12px;
     color: var(--muted);
     margin-top: 8px;
@@ -532,7 +595,7 @@
     border: 1px dashed var(--border);
     border-radius: 8px;
   }
-  .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .header-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 
   /* ===== MODAL ===== */
   .modal-overlay {
@@ -543,6 +606,7 @@
     align-items: center;
     justify-content: center;
     z-index: 100;
+    padding: 16px;
   }
   .modal-overlay.active { display: flex; }
   .modal {
@@ -550,41 +614,167 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 20px;
-    min-width: 340px;
-    max-width: 90vw;
+    width: 100%;
+    max-width: 420px;
     box-shadow: 0 10px 40px rgba(0,0,0,.4);
   }
   .modal h3 { margin: 0 0 12px; font-size: 15px; }
   .modal input { width: 100%; margin-bottom: 14px; }
   .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+  /* =========================================================
+     АДАПТАЦИЯ ПОД ПЛАНШЕТ (≤900px)
+     ========================================================= */
+  @media (max-width: 900px) {
+    .kanban {
+      grid-template-columns: repeat(4, 260px);
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 8px;
+    }
+    .column { scroll-snap-align: start; }
+    .health-grid {
+      grid-template-columns: repeat(7, minmax(140px, 1fr));
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 8px;
+    }
+    .day-card { scroll-snap-align: center; }
+  }
+
+  /* =========================================================
+     АДАПТАЦИЯ ПОД ТЕЛЕФОН (≤640px)
+     ========================================================= */
+  @media (max-width: 640px) {
+    header {
+      gap: 8px;
+      padding: calc(8px + var(--safe-top)) 12px 8px;
+    }
+    header h1 { font-size: 14px; }
+    .theme-toggle .opt { padding: 5px 8px; font-size: 11px; }
+    .header-actions button { padding: 6px 10px; font-size: 12px; }
+
+    main { padding: 12px 12px calc(12px + var(--safe-bottom)); }
+
+    .tabs { padding: 6px 8px 0; }
+    .tab { padding: 10px 12px; font-size: 13px; }
+
+    /* Канбан — горизонтальный скролл */
+    .kanban {
+      grid-template-columns: repeat(4, 82vw);
+      gap: 10px;
+    }
+    .column { min-height: 160px; padding: 10px; }
+
+    /* Карточка — кнопки внизу всегда видимы */
+    .card .actions { display: none; }
+    .card { cursor: default; }
+
+    /* Здоровье — карточка на 70vw, скролл по центру */
+    .health-grid {
+      grid-template-columns: repeat(7, 70vw);
+      gap: 10px;
+    }
+    .day-card { min-height: 260px; }
+
+    /* Календарь компактнее */
+    .cal-grid { gap: 4px; }
+    .cal-cell { min-height: 64px; padding: 4px; font-size: 10px; }
+    .cal-cell .daynum { font-size: 10px; margin-bottom: 3px; }
+    .cal-task { font-size: 9px; padding: 1px 4px; }
+    .cal-grid.year .cal-cell { min-height: 52px; }
+
+    /* Увлечения — таблицы в карточки */
+    .subtabs.sections { gap: 4px; }
+    .subtab { padding: 7px 10px; font-size: 12px; }
+    .subtab.section { padding: 6px 10px; font-size: 11px; }
+
+    .hobby-form { gap: 6px; }
+    .hobby-form input[type=text] { min-width: 100%; }
+    .hobby-form input[type=date] { flex: 1; }
+    .hobby-form button { flex-shrink: 0; }
+
+    /* Таблицы → stacked */
+    table, thead, tbody, tr, td { display: block; }
+    thead { display: none; }
+    table { border: none; background: transparent; box-shadow: none; border-radius: 0; }
+    tr {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-areas:
+        "main main"
+        "meta actions";
+      gap: 8px;
+      align-items: center;
+    }
+    td { padding: 0; border: none; font-size: 13px; }
+
+    /* каждая ячейка — назначение через nth-child */
+    td:nth-child(1) { grid-area: main; } /* обычно title или № */
+    td:nth-child(2) { grid-area: meta; color: var(--muted); font-size: 12px; }
+    td:nth-child(n+3) { grid-area: actions; display: flex; gap: 8px; justify-content: flex-end; align-items: center; }
+    td.num-cell { grid-area: main; font-size: 11px; color: var(--muted); }
+    td.actions-cell { grid-area: actions; }
+
+    /* Специфика задач: title / deadline / checkbox / delete */
+    /* Строка задачи: 4 ячейки */
+    /* 1=title, 2=deadline, 3=done-cell, 4=actions */
+    /* уже разложено выше */
+    td.done-cell { grid-area: actions; text-align: right; }
+
+    /* Заголовок задачи первым, deadline второй строкой */
+    tr td:nth-child(1) { font-weight: 500; }
+
+    /* Модалка */
+    .modal { padding: 16px; }
+
+    /* График меньше */
+    .chart-panel { padding: 12px; }
+    .chart-head h3 { font-size: 13px; }
+    .chart-head .seg button { padding: 6px 10px; font-size: 11px; }
+  }
+
+  /* Очень маленькие телефоны */
+  @media (max-width: 380px) {
+    .kanban { grid-template-columns: repeat(4, 88vw); }
+    .health-grid { grid-template-columns: repeat(7, 78vw); }
+  }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>🎯 Мои увлечения и здоровье</h1>
+  <h1>🎯 Хобби и Здоровье</h1>
   <div class="spacer"></div>
   <div class="header-actions">
     <div class="theme-toggle" id="themeToggle">
-      <div class="opt" data-theme="light">☀️ Дневной</div>
-      <div class="opt active" data-theme="dark">🌙 Ночной</div>
+      <div class="opt" data-theme="light">☀️</div>
+      <div class="opt active" data-theme="dark">🌙</div>
     </div>
-    <button class="ghost mini" onclick="exportData()">Экспорт</button>
-    <button class="ghost mini" onclick="document.getElementById('importFile').click()">Импорт</button>
+    <button class="ghost mini" onclick="exportData()" title="Экспорт">⬇</button>
+    <button class="ghost mini" onclick="document.getElementById('importFile').click()" title="Импорт">⬆</button>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
   </div>
 </header>
 
-<div class="tabs">
-  <div class="tab active" data-view="kanban">Канбан</div>
+<div class="tabs" id="mainTabs">
+  <div class="tab" data-view="kanban">Канбан</div>
   <div class="tab" data-view="calendar">Календарь</div>
   <div class="tab" data-view="hobbies">Увлечения</div>
-  <div class="tab" data-view="health">Здоровье</div>
+  <div class="tab active" data-view="health">Здоровье</div>
 </div>
 
 <main>
   <!-- KANBAN -->
-  <section class="view active" id="view-kanban">
+  <section class="view" id="view-kanban">
     <div style="margin-bottom:14px;">
       <button onclick="addKanbanCard()">+ Карточка (только Канбан)</button>
     </div>
@@ -603,28 +793,23 @@
       <button class="ghost mini" onclick="calToday()">Сегодня</button>
       <button class="ghost mini" onclick="calShift(1)">→</button>
       <div class="spacer" style="flex:1"></div>
-      <span id="calTitle" style="color:var(--muted)"></span>
+      <span id="calTitle" style="color:var(--muted); font-size:12px;"></span>
     </div>
     <div class="cal-grid week" id="calGrid"></div>
   </section>
 
   <!-- HOBBIES -->
   <section class="view" id="view-hobbies">
-    <!-- верхний ряд: увлечение -->
     <div class="subtabs" id="subtabs">
       <div class="subtab active dj" data-hobby="dj">🎧 Диджеинг</div>
-      <div class="subtab code" data-hobby="code">💻 Создание программ</div>
+      <div class="subtab code" data-hobby="code">💻 Программы</div>
     </div>
-
-    <!-- нижний ряд: секция -->
     <div class="subtabs sections" id="sectionTabs"></div>
-
-    <!-- контейнер секции -->
     <div id="sectionBody"></div>
   </section>
 
   <!-- HEALTH -->
-  <section class="view" id="view-health">
+  <section class="view active" id="view-health">
     <div class="health-grid" id="healthGrid"></div>
 
     <div class="chart-panel">
@@ -632,16 +817,16 @@
         <h3>📈 Динамика состояния</h3>
         <div class="seg" id="chartSeg">
           <button data-range="month" class="active">Месяц</button>
-          <button data-range="quarter">3 месяца</button>
+          <button data-range="quarter">3 мес</button>
           <button data-range="year">Год</button>
         </div>
       </div>
       <div class="chart-wrap">
-        <canvas id="healthChart" height="260"></canvas>
+        <canvas id="healthChart" height="220"></canvas>
       </div>
       <div class="chart-legend">
         <span><span class="dot" style="background:var(--warn)"></span>Подъём</span>
-        <span><span class="dot" style="background:var(--ok)"></span>Нормально</span>
+        <span><span class="dot" style="background:var(--ok)"></span>Норма</span>
         <span><span class="dot" style="background:var(--bad)"></span>Спад</span>
         <span style="color:var(--muted)">· пусто = нет записи</span>
       </div>
@@ -653,7 +838,7 @@
 <div class="modal-overlay" id="linkModal">
   <div class="modal">
     <h3 id="linkModalTitle">Вставить ссылку</h3>
-    <input type="text" id="linkModalInput" placeholder="https://...">
+    <input type="text" id="linkModalInput" placeholder="https://..." autocomplete="off">
     <div class="modal-actions">
       <button class="ghost" onclick="closeLinkModal()">Отмена</button>
       <button onclick="saveLinkModal()">Сохранить</button>
@@ -662,6 +847,28 @@
 </div>
 
 <script>
+/* ============================================================
+   МОБИЛЬНЫЙ ПОРЯДОК ВКЛАДОК
+   ============================================================ */
+function applyMobileTabOrder() {
+  const isMobile = window.matchMedia('(max-width: 640px)').matches;
+  const tabsEl = document.getElementById('mainTabs');
+  const tabs = [...tabsEl.querySelectorAll('.tab')];
+  // порядок для мобилы: health, kanban, calendar, hobbies
+  const mobileOrder = ['health', 'kanban', 'calendar', 'hobbies'];
+  const desktopOrder = ['kanban', 'calendar', 'hobbies', 'health'];
+  const order = isMobile ? mobileOrder : desktopOrder;
+  order.forEach(name => {
+    const t = tabs.find(x => x.dataset.view === name);
+    if (t) tabsEl.appendChild(t);
+  });
+}
+applyMobileTabOrder();
+window.addEventListener('resize', () => {
+  clearTimeout(window._orderTimer);
+  window._orderTimer = setTimeout(applyMobileTabOrder, 150);
+});
+
 /* ============================================================
    СОСТОЯНИЕ
    ============================================================ */
@@ -672,10 +879,10 @@ const DEFAULT_STATE = {
   tasks: [],
   kanbanCards: [],
   health: {},
-  works: [],       // записанные работы Диджеинга: {id, title, date, url}
-  programs: [],    // программы: {id, title, url, done, createdAt}
+  works: [],
+  programs: [],
   activeHobby: 'dj',
-  activeSection: { dj: 'tasks', code: 'tasks' } // какая секция открыта у каждого увлечения
+  activeSection: { dj: 'tasks', code: 'tasks' }
 };
 
 let state = loadState();
@@ -687,7 +894,6 @@ function loadState() {
     if (!raw) return structuredClone(DEFAULT_STATE);
     const parsed = JSON.parse(raw);
     const merged = { ...structuredClone(DEFAULT_STATE), ...parsed };
-    // гарантируем наличие activeSection
     if (!merged.activeSection) merged.activeSection = { dj: 'tasks', code: 'tasks' };
     if (!merged.works) merged.works = [];
     if (!merged.programs) merged.programs = [];
@@ -710,6 +916,8 @@ function applyTheme(t) {
   document.querySelectorAll('#themeToggle .opt').forEach(o => {
     o.classList.toggle('active', o.dataset.theme === t);
   });
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', t === 'dark' ? '#0f1117' : '#f5f6fa');
   if (document.getElementById('view-health').classList.contains('active')) {
     drawHealthChart();
   }
@@ -767,13 +975,13 @@ const COLUMNS = [
 function renderKanban() {
   const root = document.getElementById('kanban');
   root.innerHTML = '';
-  COLUMNS.forEach(col => {
+  COLUMNS.forEach((col, colIdx) => {
     const colDiv = document.createElement('div');
     colDiv.className = 'column';
     colDiv.dataset.col = col.id;
     const cards = state.kanbanCards.filter(c => c.column === col.id);
     colDiv.innerHTML = `<h3>${col.title} <span class="count">${cards.length}</span></h3>`;
-    cards.forEach(card => colDiv.appendChild(renderCard(card)));
+    cards.forEach(card => colDiv.appendChild(renderCard(card, colIdx)));
     colDiv.addEventListener('dragover', e => { e.preventDefault(); colDiv.classList.add('drag-over'); });
     colDiv.addEventListener('dragleave', () => colDiv.classList.remove('drag-over'));
     colDiv.addEventListener('drop', e => {
@@ -786,7 +994,7 @@ function renderKanban() {
   });
 }
 
-function renderCard(card) {
+function renderCard(card, colIdx) {
   const el = document.createElement('div');
   el.className = 'card' + (card.hobby ? ' hobby-' + card.hobby : '');
   el.draggable = true;
@@ -802,19 +1010,37 @@ function renderCard(card) {
     metaHtml += `<span class="badge">Канбан</span>`;
   }
   if (deadline) metaHtml += `<span>до ${formatRu(deadline)}</span>`;
+
+  const canLeft = colIdx > 0;
+  const canRight = colIdx < COLUMNS.length - 1;
+
   el.innerHTML = `
-    <div class="actions">
-      <button class="icon-btn" title="Удалить" onclick="deleteCard('${card.id}')">✕</button>
-    </div>
     <div class="title" style="${isDone ? 'text-decoration:line-through;opacity:.6' : ''}">${escapeHtml(card.title)}</div>
     <div class="meta">${metaHtml}</div>
+    <div class="move-row">
+      <div class="move-btns">
+        <button class="move-btn" ${canLeft ? '' : 'disabled'} title="Влево" onclick="moveCardBy('${card.id}', -1)">←</button>
+        <button class="move-btn" ${canRight ? '' : 'disabled'} title="Вправо" onclick="moveCardBy('${card.id}', 1)">→</button>
+      </div>
+      <button class="del-btn" title="Удалить" onclick="deleteCard('${card.id}')">🗑</button>
+    </div>
   `;
+
   el.addEventListener('dragstart', e => {
-    e.dataTransfer.setData('text/plain', card.id);
+    if (e.dataTransfer) e.dataTransfer.setData('text/plain', card.id);
     el.classList.add('dragging');
   });
   el.addEventListener('dragend', () => el.classList.remove('dragging'));
   return el;
+}
+
+function moveCardBy(cardId, delta) {
+  const card = state.kanbanCards.find(c => c.id === cardId);
+  if (!card) return;
+  const idx = COLUMNS.findIndex(c => c.id === card.column);
+  const newIdx = idx + delta;
+  if (newIdx < 0 || newIdx >= COLUMNS.length) return;
+  moveCard(cardId, COLUMNS[newIdx].id);
 }
 
 function moveCard(cardId, targetCol) {
@@ -855,19 +1081,19 @@ function deleteCard(cardId) {
 }
 
 /* ============================================================
-   УВЛЕЧЕНИЯ — СТРУКТУРА
+   УВЛЕЧЕНИЯ
    ============================================================ */
 const SECTIONS = {
   dj: [
     { id: 'tasks',    label: 'Задачи' },
     { id: 'learning', label: 'Обучение' },
-    { id: 'collection', label: 'Музыкальная коллекция' },
-    { id: 'works',    label: 'Записанные работы' }
+    { id: 'collection', label: 'Коллекция' },
+    { id: 'works',    label: 'Работы' }
   ],
   code: [
     { id: 'tasks',    label: 'Задачи' },
-    { id: 'inProgress', label: 'Программы в работе' },
-    { id: 'finished',   label: 'Завершённые программы' }
+    { id: 'inProgress', label: 'В работе' },
+    { id: 'finished',   label: 'Завершённые' }
   ]
 };
 
@@ -880,12 +1106,10 @@ document.querySelectorAll('#subtabs .subtab').forEach(st => {
 });
 
 function renderHobbies() {
-  // верхний ряд
   document.querySelectorAll('#subtabs .subtab').forEach(st => {
     st.classList.toggle('active', st.dataset.hobby === state.activeHobby);
   });
 
-  // нижний ряд
   const tabsEl = document.getElementById('sectionTabs');
   tabsEl.innerHTML = '';
   const sections = SECTIONS[state.activeHobby];
@@ -903,7 +1127,6 @@ function renderHobbies() {
     tabsEl.appendChild(el);
   });
 
-  // тело
   const body = document.getElementById('sectionBody');
   body.innerHTML = '';
 
@@ -920,9 +1143,6 @@ function renderHobbies() {
   }
 }
 
-/* ============================================================
-   СЕКЦИЯ: ЗАДАЧИ (как было)
-   ============================================================ */
 function renderTasksSection(container) {
   container.innerHTML = `
     <div class="hobby-form">
@@ -942,15 +1162,12 @@ function renderTasksSection(container) {
       <tbody id="hobbyTable"></tbody>
     </table>
   `;
-
   const tbody = document.getElementById('hobbyTable');
   const tasks = state.tasks.filter(t => t.hobby === state.activeHobby);
-
   if (tasks.length === 0) {
     tbody.innerHTML = `<tr><td colspan="4"><div class="empty">Пока нет задач. Добавь первую!</div></td></tr>`;
     return;
   }
-
   tasks
     .sort((a, b) => (a.deadline || '9999').localeCompare(b.deadline || '9999'))
     .forEach(task => {
@@ -962,7 +1179,7 @@ function renderTasksSection(container) {
         <td class="done-cell">
           <div class="checkbox ${task.done ? 'checked' : ''}" onclick="toggleTaskDone('${task.id}')">${task.done ? '✓' : ''}</div>
         </td>
-        <td class="actions-cell"><button class="ghost mini" onclick="deleteTask('${task.id}')">✕</button></td>
+        <td class="actions-cell"><button class="ghost mini" onclick="deleteTask('${task.id}')">🗑</button></td>
       `;
       tbody.appendChild(tr);
     });
@@ -1003,9 +1220,6 @@ function deleteTask(taskId) {
   renderCalendar();
 }
 
-/* ============================================================
-   СЕКЦИЯ: ЗАПИСАННЫЕ РАБОТЫ (только Диджеинг)
-   ============================================================ */
 function renderWorksSection(container) {
   container.innerHTML = `
     <div class="hobby-form">
@@ -1033,24 +1247,19 @@ function renderWorksRows() {
   const tbody = document.getElementById('worksTable');
   if (!tbody) return;
   tbody.innerHTML = '';
-
   const works = [...state.works].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-
   if (works.length === 0) {
     tbody.innerHTML = `<tr><td colspan="5"><div class="empty">Пока нет записанных работ</div></td></tr>`;
     return;
   }
-
   works.forEach((w, i) => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td class="num-cell">${i + 1}</td>
       <td>${escapeHtml(w.title)}</td>
       <td>${w.date ? formatRu(w.date) : '—'}</td>
-      <td style="text-align:center;">
-        ${renderLinkButton(w.id, 'work', w.url)}
-      </td>
-      <td class="actions-cell"><button class="ghost mini" onclick="deleteWork('${w.id}')">✕</button></td>
+      <td style="text-align:center;">${renderLinkButton(w.id, 'work', w.url)}</td>
+      <td class="actions-cell"><button class="ghost mini" onclick="deleteWork('${w.id}')">🗑</button></td>
     `;
     tbody.appendChild(tr);
   });
@@ -1075,11 +1284,7 @@ function deleteWork(id) {
   renderWorksRows();
 }
 
-/* ============================================================
-   СЕКЦИЯ: ПРОГРАММЫ (в работе / завершённые)
-   ============================================================ */
 function renderProgramsSection(container, done) {
-  const title = done ? 'Завершённые программы' : 'Программы в работе';
   container.innerHTML = `
     <div class="hobby-form">
       <input type="text" id="progTitle" placeholder="Название программы...">
@@ -1104,16 +1309,13 @@ function renderProgramsRows(done) {
   const tbody = document.getElementById('progTable');
   if (!tbody) return;
   tbody.innerHTML = '';
-
   const items = state.programs
     .filter(p => !!p.done === done)
     .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-
   if (items.length === 0) {
     tbody.innerHTML = `<tr><td colspan="4"><div class="empty">${done ? 'Пока нет завершённых программ' : 'Пока нет программ в работе'}</div></td></tr>`;
     return;
   }
-
   items.forEach(p => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -1121,10 +1323,10 @@ function renderProgramsRows(done) {
       <td style="text-align:center;">${renderLinkButton(p.id, 'program', p.url)}</td>
       <td style="text-align:center;">
         <button class="ghost mini" onclick="toggleProgramDone('${p.id}')">
-          ${p.done ? '↩ Вернуть в работу' : '✓ Завершить'}
+          ${p.done ? '↩ Вернуть' : '✓ Завершить'}
         </button>
       </td>
-      <td class="actions-cell"><button class="ghost mini" onclick="deleteProgram('${p.id}')">✕</button></td>
+      <td class="actions-cell"><button class="ghost mini" onclick="deleteProgram('${p.id}')">🗑</button></td>
     `;
     tbody.appendChild(tr);
   });
@@ -1134,13 +1336,7 @@ function addProgram(done) {
   const el = document.getElementById('progTitle');
   const title = el.value.trim();
   if (!title) return;
-  state.programs.push({
-    id: uid(),
-    title,
-    url: '',
-    done: !!done,
-    createdAt: Date.now()
-  });
+  state.programs.push({ id: uid(), title, url: '', done: !!done, createdAt: Date.now() });
   el.value = '';
   saveState();
   renderProgramsRows(done);
@@ -1151,7 +1347,6 @@ function toggleProgramDone(id) {
   if (!p) return;
   p.done = !p.done;
   saveState();
-  // перерисовываем текущую секцию
   renderHobbies();
 }
 
@@ -1163,9 +1358,9 @@ function deleteProgram(id) {
 }
 
 /* ============================================================
-   ССЫЛКИ (кнопка + модалка)
+   ССЫЛКИ
    ============================================================ */
-let linkModalCtx = null; // {entityId, entityType}
+let linkModalCtx = null;
 
 function renderLinkButton(entityId, entityType, url) {
   const hasLink = url && url.trim();
@@ -1181,7 +1376,6 @@ function openLinkModal(entityId, entityType) {
   const modal = document.getElementById('linkModal');
   const input = document.getElementById('linkModalInput');
   input.value = '';
-  document.getElementById('linkModalTitle').textContent = 'Вставить ссылку';
   modal.classList.add('active');
   setTimeout(() => input.focus(), 50);
 }
@@ -1195,9 +1389,7 @@ function saveLinkModal() {
   if (!linkModalCtx) return;
   let url = document.getElementById('linkModalInput').value.trim();
   if (!url) { closeLinkModal(); return; }
-  // автодобавление протокола
   if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
-
   const { entityId, entityType } = linkModalCtx;
   if (entityType === 'work') {
     const w = state.works.find(x => x.id === entityId);
@@ -1211,15 +1403,11 @@ function saveLinkModal() {
   renderHobbies();
 }
 
-// Enter в модалке = сохранить
 document.getElementById('linkModalInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') saveLinkModal();
   if (e.key === 'Escape') closeLinkModal();
 });
 
-/* ============================================================
-   ЗАГЛУШКА
-   ============================================================ */
 function renderStub(container, title) {
   container.innerHTML = `
     <div class="stub">
@@ -1274,7 +1462,7 @@ function renderCalendar() {
     const offset = dow === 0 ? -6 : 1 - dow;
     const monday = new Date(base);
     monday.setDate(base.getDate() + offset);
-    title.textContent = `Неделя ${formatRu(toISO(monday))} — ${formatRu(addDays(toISO(monday), 6))}`;
+    title.textContent = `${formatRu(toISO(monday))} — ${formatRu(addDays(toISO(monday), 6))}`;
     for (let i = 0; i < 7; i++) {
       grid.appendChild(buildDayCell(addDays(toISO(monday), i), today, map));
     }
@@ -1351,6 +1539,7 @@ function renderHealth() {
     const rec = state.health[iso] || { state: null, medMorning: false, medEvening: false };
     const card = document.createElement('div');
     card.className = 'day-card' + (i === 0 ? ' today' : '');
+    card.dataset.iso = iso;
     card.innerHTML = `
       <div class="dow">${DOW_RU[d.getDay()]}</div>
       <div class="date">${formatRu(iso)}</div>
@@ -1376,6 +1565,16 @@ function renderHealth() {
     `;
     grid.appendChild(card);
   }
+
+  // центрируем "сегодня" при первой отрисовке на мобиле
+  if (window.matchMedia('(max-width: 900px)').matches) {
+    requestAnimationFrame(() => {
+      const todayCard = grid.querySelector('.day-card.today');
+      if (todayCard) {
+        todayCard.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'auto' });
+      }
+    });
+  }
 }
 
 function setHealthState(iso, s) {
@@ -1394,7 +1593,7 @@ function toggleMed(iso, key) {
 }
 
 /* ============================================================
-   ГРАФИК СОСТОЯНИЙ
+   ГРАФИК
    ============================================================ */
 let chartRange = 'month';
 
@@ -1419,7 +1618,8 @@ function drawHealthChart() {
   const wrap = canvas.parentElement;
   const dpr = window.devicePixelRatio || 1;
   const cssWidth = wrap.clientWidth;
-  const cssHeight = 260;
+  const isMobile = window.matchMedia('(max-width: 640px)').matches;
+  const cssHeight = isMobile ? 200 : 240;
   canvas.width = cssWidth * dpr;
   canvas.height = cssHeight * dpr;
   canvas.style.width = cssWidth + 'px';
@@ -1451,7 +1651,10 @@ function drawHealthChart() {
     });
   }
 
-  const padL = 44, padR = 16, padT = 24, padB = 34;
+  const padL = isMobile ? 32 : 44;
+  const padR = 12;
+  const padT = 18;
+  const padB = isMobile ? 26 : 32;
   const plotW = cssWidth - padL - padR;
   const plotH = cssHeight - padT - padB;
 
@@ -1471,22 +1674,22 @@ function drawHealthChart() {
   ctx.setLineDash([]);
 
   ctx.fillStyle = colMuted;
-  ctx.font = '11px -apple-system, sans-serif';
+  ctx.font = isMobile ? '10px -apple-system, sans-serif' : '11px -apple-system, sans-serif';
   ctx.textAlign = 'right';
   ctx.textBaseline = 'middle';
-  ctx.fillText('Подъём', padL - 8, yOf(1));
-  ctx.fillText('Норма',  padL - 8, yOf(0));
-  ctx.fillText('Спад',   padL - 8, yOf(-1));
+  ctx.fillText('▲', padL - 8, yOf(1));
+  ctx.fillText('=', padL - 8, yOf(0));
+  ctx.fillText('▼', padL - 8, yOf(-1));
 
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
-  const labelStep = Math.max(1, Math.floor(days / 8));
+  const labelStep = Math.max(1, Math.floor(days / (isMobile ? 5 : 8)));
   for (let i = 0; i < points.length; i += labelStep) {
     const d = fromISO(points[i].iso);
     const label = days > 60
       ? `${MONTH_SHORT[d.getMonth()]}`
       : `${d.getDate()}.${String(d.getMonth()+1).padStart(2,'0')}`;
-    ctx.fillText(label, xOf(i), padT + plotH + 8);
+    ctx.fillText(label, xOf(i), padT + plotH + 6);
   }
 
   const segments = [];
@@ -1502,11 +1705,11 @@ function drawHealthChart() {
 
   segments.forEach(seg => {
     if (seg.length === 1) {
-      drawPoint(ctx, seg[0].x, seg[0].y, seg[0].state, { colOk, colWarn, colBad });
+      drawPoint(ctx, seg[0].x, seg[0].y, seg[0].state, { colOk, colWarn, colBad }, isMobile);
       return;
     }
     ctx.save();
-    ctx.lineWidth = 2.5;
+    ctx.lineWidth = isMobile ? 2 : 2.5;
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
     ctx.beginPath();
@@ -1529,17 +1732,17 @@ function drawHealthChart() {
     ctx.strokeStyle = grad;
     ctx.stroke();
     ctx.restore();
-    seg.forEach(p => drawPoint(ctx, p.x, p.y, p.state, { colOk, colWarn, colBad }));
+    seg.forEach(p => drawPoint(ctx, p.x, p.y, p.state, { colOk, colWarn, colBad }, isMobile));
   });
 }
 
-function drawPoint(ctx, x, y, state, colors) {
+function drawPoint(ctx, x, y, state, colors, isMobile) {
   let c = colors.colOk;
   if (state === 'up')   c = colors.colWarn;
   if (state === 'down') c = colors.colBad;
   ctx.fillStyle = c;
   ctx.beginPath();
-  ctx.arc(x, y, 3.2, 0, Math.PI * 2);
+  ctx.arc(x, y, isMobile ? 2.6 : 3.2, 0, Math.PI * 2);
   ctx.fill();
   ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--panel').trim();
   ctx.lineWidth = 1.5;
@@ -1553,7 +1756,7 @@ window.addEventListener('resize', () => {
     if (document.getElementById('view-health').classList.contains('active')) {
       drawHealthChart();
     }
-  }, 120);
+  }, 150);
 });
 
 /* ============================================================
@@ -1599,6 +1802,90 @@ function escapeHtml(s) {
 }
 
 /* ============================================================
+   PWA: манифест + service worker (inline)
+   ============================================================ */
+function setupPWA() {
+  // 1. Манифест через Blob
+  try {
+    const manifest = {
+      name: "Хобби и Здоровье",
+      short_name: "Хобби",
+      start_url: ".",
+      display: "standalone",
+      background_color: theme === 'dark' ? '#0f1117' : '#f5f6fa',
+      theme_color: theme === 'dark' ? '#0f1117' : '#f5f6fa',
+      orientation: "portrait",
+      icons: [
+        {
+          src: generateIconDataURL(),
+          sizes: "192x192",
+          type: "image/png",
+          purpose: "any maskable"
+        },
+        {
+          src: generateIconDataURL(),
+          sizes: "512x512",
+          type: "image/png",
+          purpose: "any maskable"
+        }
+      ]
+    };
+    const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+    const manifestURL = URL.createObjectURL(manifestBlob);
+    const link = document.createElement('link');
+    link.rel = 'manifest';
+    link.href = manifestURL;
+    document.head.appendChild(link);
+  } catch (e) { console.warn('PWA manifest failed', e); }
+
+  // 2. Service worker через Blob (работает только на http/https)
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    try {
+      const swCode = `
+        self.addEventListener('install', e => { self.skipWaiting(); });
+        self.addEventListener('activate', e => { self.clients.claim(); });
+        self.addEventListener('fetch', e => {
+          e.respondWith(
+            caches.open('hobby-v1').then(cache =>
+              fetch(e.request).then(res => {
+                if (e.request.method === 'GET' && res.status === 200) {
+                  cache.put(e.request, res.clone());
+                }
+                return res;
+              }).catch(() => cache.match(e.request))
+            )
+          );
+        });
+      `;
+      const swBlob = new Blob([swCode], { type: 'application/javascript' });
+      const swURL = URL.createObjectURL(swBlob);
+      navigator.serviceWorker.register(swURL).catch(err => {
+        console.warn('SW registration failed (это ок для file://):', err.message);
+      });
+    } catch (e) { console.warn('SW setup failed', e); }
+  }
+}
+
+function generateIconDataURL() {
+  // рисуем иконку на canvas и возвращаем data URL
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 512;
+  const ctx = c.getContext('2d');
+  // фон
+  const grad = ctx.createLinearGradient(0, 0, 512, 512);
+  grad.addColorStop(0, '#6c8cff');
+  grad.addColorStop(1, '#c06cff');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 512, 512);
+  // символ 🎯
+  ctx.font = '300px -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('🎯', 256, 280);
+  return c.toDataURL('image/png');
+}
+
+/* ============================================================
    СТАРТ
    ============================================================ */
 function renderAll() {
@@ -1610,6 +1897,7 @@ function renderAll() {
 }
 applyTheme(theme);
 renderAll();
+setupPWA();
 </script>
 </body>
 </html>
