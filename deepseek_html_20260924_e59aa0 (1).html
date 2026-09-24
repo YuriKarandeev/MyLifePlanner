@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Мои увлечения и здоровье</title>
+<style>
+  :root {
+    --bg: #f5f6fa;
+    --panel: #ffffff;
+    --panel-2: #eef1f7;
+    --border: #d8dde8;
+    --text: #1a1d26;
+    --muted: #6b7280;
+    --accent: #4a6cf7;
+    --code: #2f7fe0;
+    --dj: #9b4de0;
+    --ok: #22a55a;
+    --warn: #e08a00;
+    --bad: #e0455f;
+    --shadow: 0 1px 3px rgba(0,0,0,.06);
+    --radius: 10px;
+  }
+  html[data-theme="dark"] {
+    --bg: #0f1117;
+    --panel: #171a23;
+    --panel-2: #1e222d;
+    --border: #2a2f3d;
+    --text: #e6e8ee;
+    --muted: #8b93a7;
+    --accent: #6c8cff;
+    --code: #4ea1ff;
+    --dj: #c06cff;
+    --ok: #3ddc84;
+    --warn: #ffb020;
+    --bad: #ff5c7c;
+    --shadow: 0 1px 3px rgba(0,0,0,.3);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    transition: background .2s, color .2s;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    flex-wrap: wrap;
+  }
+  header h1 { font-size: 16px; margin: 0; font-weight: 600; }
+  header .spacer { flex: 1; }
+  .tabs {
+    display: flex;
+    gap: 4px;
+    padding: 10px 20px 0;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .tab {
+    padding: 9px 16px;
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+    color: var(--muted);
+    font-weight: 500;
+    border: 1px solid transparent;
+    border-bottom: none;
+    user-select: none;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    color: var(--text);
+    background: var(--bg);
+    border-color: var(--border);
+    margin-bottom: -1px;
+  }
+  main { padding: 20px; max-width: 1400px; margin: 0 auto; }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: filter .15s;
+  }
+  button:hover { filter: brightness(1.08); }
+  button.ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  button.ghost:hover { background: var(--panel-2); }
+  button.danger { background: var(--bad); }
+  button.mini { padding: 4px 8px; font-size: 12px; }
+  button.icon-only { padding: 4px 7px; font-size: 13px; line-height: 1; }
+
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3px;
+    user-select: none;
+  }
+  .theme-toggle .opt {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: .15s;
+    white-space: nowrap;
+  }
+  .theme-toggle .opt.active {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  input, select, textarea {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+
+  /* ===== KANBAN ===== */
+  .kanban {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    align-items: start;
+  }
+  .column {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+    min-height: 200px;
+    box-shadow: var(--shadow);
+  }
+  .column h3 {
+    margin: 0 0 10px;
+    font-size: 13px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .column .count {
+    background: var(--panel-2);
+    border-radius: 20px;
+    padding: 1px 8px;
+    font-size: 11px;
+  }
+  .card {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 8px;
+    cursor: grab;
+    position: relative;
+  }
+  .card.hobby-dj { border-left-color: var(--dj); }
+  .card.hobby-code { border-left-color: var(--code); }
+  .card.dragging { opacity: .5; }
+  .card .title { font-weight: 500; margin-bottom: 6px; word-break: break-word; }
+  .card .meta {
+    display: flex;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--muted);
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .card .badge {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+  }
+  .card .badge.dj { color: var(--dj); border-color: var(--dj); }
+  .card .badge.code { color: var(--code); border-color: var(--code); }
+  .card .actions {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    display: none;
+    gap: 4px;
+  }
+  .card:hover .actions { display: flex; }
+  .card .icon-btn {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .card .icon-btn:hover { color: var(--text); background: var(--panel); }
+  .column.drag-over { border-color: var(--accent); background: rgba(108,140,255,.06); }
+
+  /* ===== CALENDAR ===== */
+  .cal-head {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .cal-head .seg {
+    display: flex;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .cal-head .seg button {
+    background: transparent;
+    color: var(--muted);
+    border-radius: 0;
+    padding: 7px 14px;
+  }
+  .cal-head .seg button.active { background: var(--accent); color: white; }
+  .cal-grid {
+    display: grid;
+    gap: 8px;
+  }
+  .cal-grid.week { grid-template-columns: repeat(7, 1fr); }
+  .cal-grid.month { grid-template-columns: repeat(7, 1fr); }
+  .cal-grid.year { grid-template-columns: repeat(4, 1fr); }
+  .cal-cell {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px;
+    min-height: 90px;
+    font-size: 12px;
+    box-shadow: var(--shadow);
+  }
+  .cal-cell.other { opacity: .45; }
+  .cal-cell.today { border-color: var(--accent); }
+  .cal-cell .daynum { color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+  .cal-cell.today .daynum { color: var(--accent); }
+  .cal-grid.year .cal-cell { min-height: 70px; }
+  .cal-task {
+    background: var(--panel-2);
+    border-left: 2px solid var(--accent);
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-bottom: 3px;
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: default;
+  }
+  .cal-task.dj { border-left-color: var(--dj); }
+  .cal-task.code { border-left-color: var(--code); }
+  .cal-task.done { text-decoration: line-through; opacity: .6; }
+
+  /* ===== HOBBIES ===== */
+  .subtabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .subtabs.sections {
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px dashed var(--border);
+  }
+  .subtab {
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    background: var(--panel);
+    user-select: none;
+    font-size: 13px;
+  }
+  .subtab.active { background: var(--panel-2); color: var(--text); }
+  .subtab.active.dj { color: var(--dj); border-color: var(--dj); }
+  .subtab.active.code { color: var(--code); border-color: var(--code); }
+  .subtab.section {
+    padding: 6px 12px;
+    font-size: 12px;
+    background: transparent;
+  }
+  .subtab.section.active {
+    background: var(--panel-2);
+    color: var(--text);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .hobby-form {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .hobby-form input[type=text] { flex: 1; min-width: 200px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  th { color: var(--muted); font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+  tr:last-child td { border-bottom: none; }
+  td.done-cell { text-align: center; }
+  td.num-cell { width: 48px; color: var(--muted); }
+  td.actions-cell { width: 60px; text-align: right; }
+  .checkbox {
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: var(--panel-2);
+    font-size: 14px;
+    line-height: 1;
+    user-select: none;
+    transition: .15s;
+  }
+  .checkbox:hover { border-color: var(--accent); }
+  .checkbox.checked {
+    background: var(--ok);
+    border-color: var(--ok);
+    color: #fff;
+    font-weight: 700;
+  }
+  .row-done td:not(.done-cell) { opacity: .55; text-decoration: line-through; }
+
+  .link-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    line-height: 1;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: .15s;
+  }
+  .link-btn.has-link {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .link-btn:hover { filter: brightness(1.15); }
+
+  .stub {
+    background: var(--panel);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .stub .big { font-size: 34px; margin-bottom: 10px; }
+
+  /* ===== HEALTH ===== */
+  .health-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .day-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 240px;
+    box-shadow: var(--shadow);
+  }
+  .day-card.today { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .day-card .date {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+  }
+  .day-card.today .date { color: var(--accent); font-weight: 600; }
+  .day-card .dow {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+  .state-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .state-btn {
+    padding: 7px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--panel-2);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 12px;
+    text-align: center;
+    transition: .15s;
+  }
+  .state-btn:hover { color: var(--text); }
+  .state-btn.active[data-state=ok]   { background: rgba(34,165,90,.15); color: var(--ok);   border-color: var(--ok); }
+  .state-btn.active[data-state=down] { background: rgba(224,69,95,.15); color: var(--bad);  border-color: var(--bad); }
+  .state-btn.active[data-state=up]   { background: rgba(224,138,0,.15); color: var(--warn); border-color: var(--warn); }
+  .meds {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: auto;
+    border-top: 1px dashed var(--border);
+    padding-top: 10px;
+  }
+  .med-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .med-row .checkbox { width: 20px; height: 20px; font-size: 12px; }
+
+  /* ===== HEALTH CHART ===== */
+  .chart-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+  .chart-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .chart-head h3 { margin: 0; font-size: 14px; font-weight: 600; }
+  .chart-head .seg {
+    display: flex;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .chart-head .seg button {
+    background: transparent;
+    color: var(--muted);
+    border-radius: 0;
+    padding: 7px 14px;
+  }
+  .chart-head .seg button.active { background: var(--accent); color: #fff; }
+  .chart-wrap { position: relative; width: 100%; }
+  canvas { width: 100%; display: block; }
+  .chart-legend {
+    display: flex;
+    gap: 16px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .chart-legend .dot {
+    display: inline-block;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  .empty {
+    color: var(--muted);
+    font-size: 13px;
+    padding: 20px;
+    text-align: center;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+  }
+  .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    min-width: 340px;
+    max-width: 90vw;
+    box-shadow: 0 10px 40px rgba(0,0,0,.4);
+  }
+  .modal h3 { margin: 0 0 12px; font-size: 15px; }
+  .modal input { width: 100%; margin-bottom: 14px; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎯 Мои увлечения и здоровье</h1>
+  <div class="spacer"></div>
+  <div class="header-actions">
+    <div class="theme-toggle" id="themeToggle">
+      <div class="opt" data-theme="light">☀️ Дневной</div>
+      <div class="opt active" data-theme="dark">🌙 Ночной</div>
+    </div>
+    <button class="ghost mini" onclick="exportData()">Экспорт</button>
+    <button class="ghost mini" onclick="document.getElementById('importFile').click()">Импорт</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" data-view="kanban">Канбан</div>
+  <div class="tab" data-view="calendar">Календарь</div>
+  <div class="tab" data-view="hobbies">Увлечения</div>
+  <div class="tab" data-view="health">Здоровье</div>
+</div>
+
+<main>
+  <!-- KANBAN -->
+  <section class="view active" id="view-kanban">
+    <div style="margin-bottom:14px;">
+      <button onclick="addKanbanCard()">+ Карточка (только Канбан)</button>
+    </div>
+    <div class="kanban" id="kanban"></div>
+  </section>
+
+  <!-- CALENDAR -->
+  <section class="view" id="view-calendar">
+    <div class="cal-head">
+      <div class="seg" id="calSeg">
+        <button data-range="week" class="active">Неделя</button>
+        <button data-range="month">Месяц</button>
+        <button data-range="year">Год</button>
+      </div>
+      <button class="ghost mini" onclick="calShift(-1)">←</button>
+      <button class="ghost mini" onclick="calToday()">Сегодня</button>
+      <button class="ghost mini" onclick="calShift(1)">→</button>
+      <div class="spacer" style="flex:1"></div>
+      <span id="calTitle" style="color:var(--muted)"></span>
+    </div>
+    <div class="cal-grid week" id="calGrid"></div>
+  </section>
+
+  <!-- HOBBIES -->
+  <section class="view" id="view-hobbies">
+    <!-- верхний ряд: увлечение -->
+    <div class="subtabs" id="subtabs">
+      <div class="subtab active dj" data-hobby="dj">🎧 Диджеинг</div>
+      <div class="subtab code" data-hobby="code">💻 Создание программ</div>
+    </div>
+
+    <!-- нижний ряд: секция -->
+    <div class="subtabs sections" id="sectionTabs"></div>
+
+    <!-- контейнер секции -->
+    <div id="sectionBody"></div>
+  </section>
+
+  <!-- HEALTH -->
+  <section class="view" id="view-health">
+    <div class="health-grid" id="healthGrid"></div>
+
+    <div class="chart-panel">
+      <div class="chart-head">
+        <h3>📈 Динамика состояния</h3>
+        <div class="seg" id="chartSeg">
+          <button data-range="month" class="active">Месяц</button>
+          <button data-range="quarter">3 месяца</button>
+          <button data-range="year">Год</button>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="healthChart" height="260"></canvas>
+      </div>
+      <div class="chart-legend">
+        <span><span class="dot" style="background:var(--warn)"></span>Подъём</span>
+        <span><span class="dot" style="background:var(--ok)"></span>Нормально</span>
+        <span><span class="dot" style="background:var(--bad)"></span>Спад</span>
+        <span style="color:var(--muted)">· пусто = нет записи</span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="linkModal">
+  <div class="modal">
+    <h3 id="linkModalTitle">Вставить ссылку</h3>
+    <input type="text" id="linkModalInput" placeholder="https://...">
+    <div class="modal-actions">
+      <button class="ghost" onclick="closeLinkModal()">Отмена</button>
+      <button onclick="saveLinkModal()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   СОСТОЯНИЕ
+   ============================================================ */
+const STORAGE_KEY = 'hobbies_health_mvp_v1';
+const THEME_KEY = 'hobbies_health_theme_v1';
+
+const DEFAULT_STATE = {
+  tasks: [],
+  kanbanCards: [],
+  health: {},
+  works: [],       // записанные работы Диджеинга: {id, title, date, url}
+  programs: [],    // программы: {id, title, url, done, createdAt}
+  activeHobby: 'dj',
+  activeSection: { dj: 'tasks', code: 'tasks' } // какая секция открыта у каждого увлечения
+};
+
+let state = loadState();
+let theme = localStorage.getItem(THEME_KEY) || 'dark';
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return structuredClone(DEFAULT_STATE);
+    const parsed = JSON.parse(raw);
+    const merged = { ...structuredClone(DEFAULT_STATE), ...parsed };
+    // гарантируем наличие activeSection
+    if (!merged.activeSection) merged.activeSection = { dj: 'tasks', code: 'tasks' };
+    if (!merged.works) merged.works = [];
+    if (!merged.programs) merged.programs = [];
+    return merged;
+  } catch (e) {
+    console.error('Ошибка загрузки', e);
+    return structuredClone(DEFAULT_STATE);
+  }
+}
+function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+
+/* ============================================================
+   ТЕМА
+   ============================================================ */
+function applyTheme(t) {
+  theme = t;
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem(THEME_KEY, t);
+  document.querySelectorAll('#themeToggle .opt').forEach(o => {
+    o.classList.toggle('active', o.dataset.theme === t);
+  });
+  if (document.getElementById('view-health').classList.contains('active')) {
+    drawHealthChart();
+  }
+}
+document.querySelectorAll('#themeToggle .opt').forEach(o => {
+  o.addEventListener('click', () => applyTheme(o.dataset.theme));
+});
+
+/* ============================================================
+   УТИЛИТЫ ДАТ
+   ============================================================ */
+function todayISO() { return toISO(new Date()); }
+function toISO(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+function fromISO(s) {
+  const [y, m, d] = s.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+function addDays(iso, n) { const d = fromISO(iso); d.setDate(d.getDate() + n); return toISO(d); }
+function formatRu(iso) { if (!iso) return '—'; const [y, m, d] = iso.split('-'); return `${d}.${m}.${y}`; }
+const DOW_RU = ['вс','пн','вт','ср','чт','пт','сб'];
+const MONTH_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const MONTH_SHORT = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+
+/* ============================================================
+   ВКЛАДКИ
+   ============================================================ */
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('view-' + tab.dataset.view).classList.add('active');
+    if (tab.dataset.view === 'kanban') renderKanban();
+    if (tab.dataset.view === 'calendar') renderCalendar();
+    if (tab.dataset.view === 'hobbies') renderHobbies();
+    if (tab.dataset.view === 'health') { renderHealth(); drawHealthChart(); }
+  });
+});
+
+/* ============================================================
+   КАНБАН
+   ============================================================ */
+const COLUMNS = [
+  { id: 'idea',     title: 'Идея' },
+  { id: 'planned',  title: 'Запланировано' },
+  { id: 'progress', title: 'В работе' },
+  { id: 'done',     title: 'Готово' }
+];
+
+function renderKanban() {
+  const root = document.getElementById('kanban');
+  root.innerHTML = '';
+  COLUMNS.forEach(col => {
+    const colDiv = document.createElement('div');
+    colDiv.className = 'column';
+    colDiv.dataset.col = col.id;
+    const cards = state.kanbanCards.filter(c => c.column === col.id);
+    colDiv.innerHTML = `<h3>${col.title} <span class="count">${cards.length}</span></h3>`;
+    cards.forEach(card => colDiv.appendChild(renderCard(card)));
+    colDiv.addEventListener('dragover', e => { e.preventDefault(); colDiv.classList.add('drag-over'); });
+    colDiv.addEventListener('dragleave', () => colDiv.classList.remove('drag-over'));
+    colDiv.addEventListener('drop', e => {
+      e.preventDefault();
+      colDiv.classList.remove('drag-over');
+      const id = e.dataTransfer.getData('text/plain');
+      moveCard(id, col.id);
+    });
+    root.appendChild(colDiv);
+  });
+}
+
+function renderCard(card) {
+  const el = document.createElement('div');
+  el.className = 'card' + (card.hobby ? ' hobby-' + card.hobby : '');
+  el.draggable = true;
+  el.dataset.id = card.id;
+  const linkedTask = card.taskId ? state.tasks.find(t => t.id === card.taskId) : null;
+  const deadline = linkedTask?.deadline;
+  const isDone = card.column === 'done';
+  let metaHtml = '';
+  if (card.hobby) {
+    const label = card.hobby === 'dj' ? 'Диджеинг' : 'Программы';
+    metaHtml += `<span class="badge ${card.hobby}">${label}</span>`;
+  } else {
+    metaHtml += `<span class="badge">Канбан</span>`;
+  }
+  if (deadline) metaHtml += `<span>до ${formatRu(deadline)}</span>`;
+  el.innerHTML = `
+    <div class="actions">
+      <button class="icon-btn" title="Удалить" onclick="deleteCard('${card.id}')">✕</button>
+    </div>
+    <div class="title" style="${isDone ? 'text-decoration:line-through;opacity:.6' : ''}">${escapeHtml(card.title)}</div>
+    <div class="meta">${metaHtml}</div>
+  `;
+  el.addEventListener('dragstart', e => {
+    e.dataTransfer.setData('text/plain', card.id);
+    el.classList.add('dragging');
+  });
+  el.addEventListener('dragend', () => el.classList.remove('dragging'));
+  return el;
+}
+
+function moveCard(cardId, targetCol) {
+  const card = state.kanbanCards.find(c => c.id === cardId);
+  if (!card || card.column === targetCol) return;
+  card.column = targetCol;
+  if (card.taskId) {
+    const task = state.tasks.find(t => t.id === card.taskId);
+    if (task) task.done = (targetCol === 'done');
+  }
+  saveState();
+  renderKanban();
+}
+
+function addKanbanCard() {
+  const title = prompt('Название карточки:');
+  if (!title || !title.trim()) return;
+  state.kanbanCards.push({ id: uid(), title: title.trim(), column: 'idea', taskId: null, hobby: null });
+  saveState();
+  renderKanban();
+}
+
+function deleteCard(cardId) {
+  const card = state.kanbanCards.find(c => c.id === cardId);
+  if (!card) return;
+  if (card.taskId) {
+    if (!confirm('Это карточка задачи из «Увлечений». Удалить саму задачу?')) return;
+    state.tasks = state.tasks.filter(t => t.id !== card.taskId);
+    state.kanbanCards = state.kanbanCards.filter(c => c.taskId !== card.taskId);
+  } else {
+    if (!confirm('Удалить карточку?')) return;
+    state.kanbanCards = state.kanbanCards.filter(c => c.id !== cardId);
+  }
+  saveState();
+  renderKanban();
+  renderHobbies();
+  renderCalendar();
+}
+
+/* ============================================================
+   УВЛЕЧЕНИЯ — СТРУКТУРА
+   ============================================================ */
+const SECTIONS = {
+  dj: [
+    { id: 'tasks',    label: 'Задачи' },
+    { id: 'learning', label: 'Обучение' },
+    { id: 'collection', label: 'Музыкальная коллекция' },
+    { id: 'works',    label: 'Записанные работы' }
+  ],
+  code: [
+    { id: 'tasks',    label: 'Задачи' },
+    { id: 'inProgress', label: 'Программы в работе' },
+    { id: 'finished',   label: 'Завершённые программы' }
+  ]
+};
+
+document.querySelectorAll('#subtabs .subtab').forEach(st => {
+  st.addEventListener('click', () => {
+    state.activeHobby = st.dataset.hobby;
+    saveState();
+    renderHobbies();
+  });
+});
+
+function renderHobbies() {
+  // верхний ряд
+  document.querySelectorAll('#subtabs .subtab').forEach(st => {
+    st.classList.toggle('active', st.dataset.hobby === state.activeHobby);
+  });
+
+  // нижний ряд
+  const tabsEl = document.getElementById('sectionTabs');
+  tabsEl.innerHTML = '';
+  const sections = SECTIONS[state.activeHobby];
+  const activeSec = state.activeSection[state.activeHobby] || sections[0].id;
+
+  sections.forEach(s => {
+    const el = document.createElement('div');
+    el.className = 'subtab section' + (s.id === activeSec ? ' active' : '');
+    el.textContent = s.label;
+    el.addEventListener('click', () => {
+      state.activeSection[state.activeHobby] = s.id;
+      saveState();
+      renderHobbies();
+    });
+    tabsEl.appendChild(el);
+  });
+
+  // тело
+  const body = document.getElementById('sectionBody');
+  body.innerHTML = '';
+
+  if (activeSec === 'tasks') {
+    renderTasksSection(body);
+  } else if (activeSec === 'learning' || activeSec === 'collection') {
+    renderStub(body, activeSec === 'learning' ? 'Дорожная карта обучения' : 'Музыкальная коллекция');
+  } else if (activeSec === 'works') {
+    renderWorksSection(body);
+  } else if (activeSec === 'inProgress') {
+    renderProgramsSection(body, false);
+  } else if (activeSec === 'finished') {
+    renderProgramsSection(body, true);
+  }
+}
+
+/* ============================================================
+   СЕКЦИЯ: ЗАДАЧИ (как было)
+   ============================================================ */
+function renderTasksSection(container) {
+  container.innerHTML = `
+    <div class="hobby-form">
+      <input type="text" id="hobbyTaskText" placeholder="Новая задача...">
+      <input type="date" id="hobbyTaskDate">
+      <button onclick="addHobbyTask()">Добавить</button>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Задача</th>
+          <th style="width:160px;">Дедлайн</th>
+          <th style="width:120px; text-align:center;">Выполнено</th>
+          <th style="width:80px;"></th>
+        </tr>
+      </thead>
+      <tbody id="hobbyTable"></tbody>
+    </table>
+  `;
+
+  const tbody = document.getElementById('hobbyTable');
+  const tasks = state.tasks.filter(t => t.hobby === state.activeHobby);
+
+  if (tasks.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty">Пока нет задач. Добавь первую!</div></td></tr>`;
+    return;
+  }
+
+  tasks
+    .sort((a, b) => (a.deadline || '9999').localeCompare(b.deadline || '9999'))
+    .forEach(task => {
+      const tr = document.createElement('tr');
+      if (task.done) tr.classList.add('row-done');
+      tr.innerHTML = `
+        <td>${escapeHtml(task.title)}</td>
+        <td>${task.deadline ? formatRu(task.deadline) : '—'}</td>
+        <td class="done-cell">
+          <div class="checkbox ${task.done ? 'checked' : ''}" onclick="toggleTaskDone('${task.id}')">${task.done ? '✓' : ''}</div>
+        </td>
+        <td class="actions-cell"><button class="ghost mini" onclick="deleteTask('${task.id}')">✕</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+}
+
+function addHobbyTask() {
+  const textEl = document.getElementById('hobbyTaskText');
+  const dateEl = document.getElementById('hobbyTaskDate');
+  const title = textEl.value.trim();
+  if (!title) return;
+  const task = { id: uid(), title, deadline: dateEl.value || null, done: false, hobby: state.activeHobby };
+  state.tasks.push(task);
+  state.kanbanCards.push({ id: uid(), title: task.title, column: 'idea', taskId: task.id, hobby: task.hobby });
+  saveState();
+  renderHobbies();
+}
+
+function toggleTaskDone(taskId) {
+  const task = state.tasks.find(t => t.id === taskId);
+  if (!task) return;
+  task.done = !task.done;
+  const card = state.kanbanCards.find(c => c.taskId === taskId);
+  if (card) {
+    if (task.done) card.column = 'done';
+    else if (card.column === 'done') card.column = 'progress';
+  }
+  saveState();
+  renderHobbies();
+}
+
+function deleteTask(taskId) {
+  if (!confirm('Удалить задачу? Карточка на Канбане тоже удалится.')) return;
+  state.tasks = state.tasks.filter(t => t.id !== taskId);
+  state.kanbanCards = state.kanbanCards.filter(c => c.taskId !== taskId);
+  saveState();
+  renderHobbies();
+  renderKanban();
+  renderCalendar();
+}
+
+/* ============================================================
+   СЕКЦИЯ: ЗАПИСАННЫЕ РАБОТЫ (только Диджеинг)
+   ============================================================ */
+function renderWorksSection(container) {
+  container.innerHTML = `
+    <div class="hobby-form">
+      <input type="text" id="workTitle" placeholder="Название работы...">
+      <input type="date" id="workDate">
+      <button onclick="addWork()">Добавить</button>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:48px;">№</th>
+          <th>Название</th>
+          <th style="width:150px;">Дата записи</th>
+          <th style="width:80px; text-align:center;">Ссылка</th>
+          <th style="width:60px;"></th>
+        </tr>
+      </thead>
+      <tbody id="worksTable"></tbody>
+    </table>
+  `;
+  renderWorksRows();
+}
+
+function renderWorksRows() {
+  const tbody = document.getElementById('worksTable');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const works = [...state.works].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+  if (works.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty">Пока нет записанных работ</div></td></tr>`;
+    return;
+  }
+
+  works.forEach((w, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="num-cell">${i + 1}</td>
+      <td>${escapeHtml(w.title)}</td>
+      <td>${w.date ? formatRu(w.date) : '—'}</td>
+      <td style="text-align:center;">
+        ${renderLinkButton(w.id, 'work', w.url)}
+      </td>
+      <td class="actions-cell"><button class="ghost mini" onclick="deleteWork('${w.id}')">✕</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function addWork() {
+  const titleEl = document.getElementById('workTitle');
+  const dateEl = document.getElementById('workDate');
+  const title = titleEl.value.trim();
+  if (!title) return;
+  state.works.push({ id: uid(), title, date: dateEl.value || null, url: '' });
+  titleEl.value = '';
+  dateEl.value = '';
+  saveState();
+  renderWorksRows();
+}
+
+function deleteWork(id) {
+  if (!confirm('Удалить работу?')) return;
+  state.works = state.works.filter(w => w.id !== id);
+  saveState();
+  renderWorksRows();
+}
+
+/* ============================================================
+   СЕКЦИЯ: ПРОГРАММЫ (в работе / завершённые)
+   ============================================================ */
+function renderProgramsSection(container, done) {
+  const title = done ? 'Завершённые программы' : 'Программы в работе';
+  container.innerHTML = `
+    <div class="hobby-form">
+      <input type="text" id="progTitle" placeholder="Название программы...">
+      <button onclick="addProgram(${done})">Добавить</button>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Название</th>
+          <th style="width:80px; text-align:center;">Ссылка</th>
+          <th style="width:150px; text-align:center;">Статус</th>
+          <th style="width:60px;"></th>
+        </tr>
+      </thead>
+      <tbody id="progTable"></tbody>
+    </table>
+  `;
+  renderProgramsRows(done);
+}
+
+function renderProgramsRows(done) {
+  const tbody = document.getElementById('progTable');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const items = state.programs
+    .filter(p => !!p.done === done)
+    .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+  if (items.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty">${done ? 'Пока нет завершённых программ' : 'Пока нет программ в работе'}</div></td></tr>`;
+    return;
+  }
+
+  items.forEach(p => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${escapeHtml(p.title)}</td>
+      <td style="text-align:center;">${renderLinkButton(p.id, 'program', p.url)}</td>
+      <td style="text-align:center;">
+        <button class="ghost mini" onclick="toggleProgramDone('${p.id}')">
+          ${p.done ? '↩ Вернуть в работу' : '✓ Завершить'}
+        </button>
+      </td>
+      <td class="actions-cell"><button class="ghost mini" onclick="deleteProgram('${p.id}')">✕</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function addProgram(done) {
+  const el = document.getElementById('progTitle');
+  const title = el.value.trim();
+  if (!title) return;
+  state.programs.push({
+    id: uid(),
+    title,
+    url: '',
+    done: !!done,
+    createdAt: Date.now()
+  });
+  el.value = '';
+  saveState();
+  renderProgramsRows(done);
+}
+
+function toggleProgramDone(id) {
+  const p = state.programs.find(x => x.id === id);
+  if (!p) return;
+  p.done = !p.done;
+  saveState();
+  // перерисовываем текущую секцию
+  renderHobbies();
+}
+
+function deleteProgram(id) {
+  if (!confirm('Удалить программу?')) return;
+  state.programs = state.programs.filter(p => p.id !== id);
+  saveState();
+  renderHobbies();
+}
+
+/* ============================================================
+   ССЫЛКИ (кнопка + модалка)
+   ============================================================ */
+let linkModalCtx = null; // {entityId, entityType}
+
+function renderLinkButton(entityId, entityType, url) {
+  const hasLink = url && url.trim();
+  const safeUrl = hasLink ? escapeHtml(url) : '';
+  if (hasLink) {
+    return `<a class="link-btn has-link" href="${safeUrl}" target="_blank" rel="noopener" title="${safeUrl}">🔗</a>`;
+  }
+  return `<button class="link-btn" title="Добавить ссылку" onclick="openLinkModal('${entityId}', '${entityType}')">🔗</button>`;
+}
+
+function openLinkModal(entityId, entityType) {
+  linkModalCtx = { entityId, entityType };
+  const modal = document.getElementById('linkModal');
+  const input = document.getElementById('linkModalInput');
+  input.value = '';
+  document.getElementById('linkModalTitle').textContent = 'Вставить ссылку';
+  modal.classList.add('active');
+  setTimeout(() => input.focus(), 50);
+}
+
+function closeLinkModal() {
+  document.getElementById('linkModal').classList.remove('active');
+  linkModalCtx = null;
+}
+
+function saveLinkModal() {
+  if (!linkModalCtx) return;
+  let url = document.getElementById('linkModalInput').value.trim();
+  if (!url) { closeLinkModal(); return; }
+  // автодобавление протокола
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+
+  const { entityId, entityType } = linkModalCtx;
+  if (entityType === 'work') {
+    const w = state.works.find(x => x.id === entityId);
+    if (w) w.url = url;
+  } else if (entityType === 'program') {
+    const p = state.programs.find(x => x.id === entityId);
+    if (p) p.url = url;
+  }
+  saveState();
+  closeLinkModal();
+  renderHobbies();
+}
+
+// Enter в модалке = сохранить
+document.getElementById('linkModalInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') saveLinkModal();
+  if (e.key === 'Escape') closeLinkModal();
+});
+
+/* ============================================================
+   ЗАГЛУШКА
+   ============================================================ */
+function renderStub(container, title) {
+  container.innerHTML = `
+    <div class="stub">
+      <div class="big">🚧</div>
+      <div style="font-weight:600; color:var(--text); margin-bottom:6px;">${escapeHtml(title)}</div>
+      <div>В разработке. Загляни позже.</div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   КАЛЕНДАРЬ
+   ============================================================ */
+let calRange = 'week';
+let calAnchor = todayISO();
+
+document.querySelectorAll('#calSeg button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#calSeg button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    calRange = btn.dataset.range;
+    renderCalendar();
+  });
+});
+
+function calShift(dir) {
+  const d = fromISO(calAnchor);
+  if (calRange === 'week') d.setDate(d.getDate() + 7 * dir);
+  else if (calRange === 'month') d.setMonth(d.getMonth() + dir);
+  else d.setFullYear(d.getFullYear() + dir);
+  calAnchor = toISO(d);
+  renderCalendar();
+}
+function calToday() { calAnchor = todayISO(); renderCalendar(); }
+
+function renderCalendar() {
+  const grid = document.getElementById('calGrid');
+  const title = document.getElementById('calTitle');
+  grid.className = 'cal-grid ' + calRange;
+  grid.innerHTML = '';
+  const today = todayISO();
+
+  const map = {};
+  state.tasks.forEach(t => {
+    if (!t.deadline) return;
+    (map[t.deadline] = map[t.deadline] || []).push(t);
+  });
+
+  if (calRange === 'week') {
+    const base = fromISO(calAnchor);
+    const dow = base.getDay();
+    const offset = dow === 0 ? -6 : 1 - dow;
+    const monday = new Date(base);
+    monday.setDate(base.getDate() + offset);
+    title.textContent = `Неделя ${formatRu(toISO(monday))} — ${formatRu(addDays(toISO(monday), 6))}`;
+    for (let i = 0; i < 7; i++) {
+      grid.appendChild(buildDayCell(addDays(toISO(monday), i), today, map));
+    }
+  } else if (calRange === 'month') {
+    const base = fromISO(calAnchor);
+    title.textContent = `${MONTH_RU[base.getMonth()]} ${base.getFullYear()}`;
+    const first = new Date(base.getFullYear(), base.getMonth(), 1);
+    const last  = new Date(base.getFullYear(), base.getMonth() + 1, 0);
+    const dow = first.getDay();
+    const pad = dow === 0 ? 6 : dow - 1;
+    for (let i = 0; i < pad; i++) {
+      const d = new Date(first); d.setDate(1 - (pad - i));
+      grid.appendChild(buildDayCell(toISO(d), today, map, true));
+    }
+    for (let i = 1; i <= last.getDate(); i++) {
+      const d = new Date(base.getFullYear(), base.getMonth(), i);
+      grid.appendChild(buildDayCell(toISO(d), today, map));
+    }
+    const total = pad + last.getDate();
+    const tail = (7 - total % 7) % 7;
+    for (let i = 1; i <= tail; i++) {
+      const d = new Date(base.getFullYear(), base.getMonth() + 1, i);
+      grid.appendChild(buildDayCell(toISO(d), today, map, true));
+    }
+  } else {
+    const y = fromISO(calAnchor).getFullYear();
+    title.textContent = `${y}`;
+    for (let m = 0; m < 12; m++) {
+      const cell = document.createElement('div');
+      cell.className = 'cal-cell';
+      cell.innerHTML = `<div class="daynum">${MONTH_RU[m]}</div>`;
+      const count = Object.keys(map).filter(iso => iso.startsWith(`${y}-${String(m+1).padStart(2,'0')}`)).length;
+      if (count) cell.innerHTML += `<div class="cal-task">${count} дедлайн(ов)</div>`;
+      grid.appendChild(cell);
+    }
+  }
+}
+
+function buildDayCell(iso, today, map, other = false) {
+  const cell = document.createElement('div');
+  cell.className = 'cal-cell';
+  if (other) cell.classList.add('other');
+  if (iso === today) cell.classList.add('today');
+  const d = fromISO(iso);
+  cell.innerHTML = `<div class="daynum">${d.getDate()} ${DOW_RU[d.getDay()]}</div>`;
+  (map[iso] || []).forEach(t => {
+    const el = document.createElement('div');
+    el.className = 'cal-task ' + t.hobby + (t.done ? ' done' : '');
+    el.textContent = t.title;
+    el.title = t.title;
+    cell.appendChild(el);
+  });
+  return cell;
+}
+
+/* ============================================================
+   ЗДОРОВЬЕ
+   ============================================================ */
+const HEALTH_STATES = [
+  { id: 'ok',   label: 'Нормально' },
+  { id: 'down', label: 'Спад' },
+  { id: 'up',   label: 'Подъём' }
+];
+const STATE_VALUE = { down: -1, ok: 0, up: 1 };
+
+function renderHealth() {
+  const grid = document.getElementById('healthGrid');
+  grid.innerHTML = '';
+  const today = todayISO();
+
+  for (let i = -3; i <= 3; i++) {
+    const iso = addDays(today, i);
+    const d = fromISO(iso);
+    const rec = state.health[iso] || { state: null, medMorning: false, medEvening: false };
+    const card = document.createElement('div');
+    card.className = 'day-card' + (i === 0 ? ' today' : '');
+    card.innerHTML = `
+      <div class="dow">${DOW_RU[d.getDay()]}</div>
+      <div class="date">${formatRu(iso)}</div>
+      <div class="state-btns">
+        ${HEALTH_STATES.map(s => `
+          <div class="state-btn ${rec.state === s.id ? 'active' : ''}"
+               data-state="${s.id}"
+               onclick="setHealthState('${iso}', '${s.id}')">${s.label}</div>
+        `).join('')}
+      </div>
+      <div class="meds">
+        <div class="med-row">
+          <span>💊 Утро</span>
+          <div class="checkbox ${rec.medMorning ? 'checked' : ''}"
+               onclick="toggleMed('${iso}', 'medMorning')">${rec.medMorning ? '✓' : ''}</div>
+        </div>
+        <div class="med-row">
+          <span>💊 Вечер</span>
+          <div class="checkbox ${rec.medEvening ? 'checked' : ''}"
+               onclick="toggleMed('${iso}', 'medEvening')">${rec.medEvening ? '✓' : ''}</div>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  }
+}
+
+function setHealthState(iso, s) {
+  if (!state.health[iso]) state.health[iso] = { state: null, medMorning: false, medEvening: false };
+  state.health[iso].state = (state.health[iso].state === s) ? null : s;
+  saveState();
+  renderHealth();
+  drawHealthChart();
+}
+
+function toggleMed(iso, key) {
+  if (!state.health[iso]) state.health[iso] = { state: null, medMorning: false, medEvening: false };
+  state.health[iso][key] = !state.health[iso][key];
+  saveState();
+  renderHealth();
+}
+
+/* ============================================================
+   ГРАФИК СОСТОЯНИЙ
+   ============================================================ */
+let chartRange = 'month';
+
+document.querySelectorAll('#chartSeg button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#chartSeg button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    chartRange = btn.dataset.range;
+    drawHealthChart();
+  });
+});
+
+function getChartDays() {
+  if (chartRange === 'month') return 30;
+  if (chartRange === 'quarter') return 90;
+  return 365;
+}
+
+function drawHealthChart() {
+  const canvas = document.getElementById('healthChart');
+  if (!canvas) return;
+  const wrap = canvas.parentElement;
+  const dpr = window.devicePixelRatio || 1;
+  const cssWidth = wrap.clientWidth;
+  const cssHeight = 260;
+  canvas.width = cssWidth * dpr;
+  canvas.height = cssHeight * dpr;
+  canvas.style.width = cssWidth + 'px';
+  canvas.style.height = cssHeight + 'px';
+
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, cssWidth, cssHeight);
+
+  const cs = getComputedStyle(document.documentElement);
+  const colBorder = cs.getPropertyValue('--border').trim();
+  const colMuted  = cs.getPropertyValue('--muted').trim();
+  const colOk     = cs.getPropertyValue('--ok').trim();
+  const colWarn   = cs.getPropertyValue('--warn').trim();
+  const colBad    = cs.getPropertyValue('--bad').trim();
+
+  const days = getChartDays();
+  const today = todayISO();
+  const start = addDays(today, -(days - 1));
+
+  const points = [];
+  for (let i = 0; i < days; i++) {
+    const iso = addDays(start, i);
+    const rec = state.health[iso];
+    points.push({
+      iso,
+      value: rec && rec.state != null ? STATE_VALUE[rec.state] : null,
+      state: rec?.state || null
+    });
+  }
+
+  const padL = 44, padR = 16, padT = 24, padB = 34;
+  const plotW = cssWidth - padL - padR;
+  const plotH = cssHeight - padT - padB;
+
+  const xOf = i => padL + (points.length === 1 ? plotW / 2 : (i / (points.length - 1)) * plotW);
+  const yOf = v => padT + plotH / 2 - (v / 1.4) * (plotH / 2);
+
+  ctx.strokeStyle = colBorder;
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 4]);
+  [1, 0, -1].forEach(v => {
+    const y = yOf(v);
+    ctx.beginPath();
+    ctx.moveTo(padL, y);
+    ctx.lineTo(padL + plotW, y);
+    ctx.stroke();
+  });
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = colMuted;
+  ctx.font = '11px -apple-system, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Подъём', padL - 8, yOf(1));
+  ctx.fillText('Норма',  padL - 8, yOf(0));
+  ctx.fillText('Спад',   padL - 8, yOf(-1));
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  const labelStep = Math.max(1, Math.floor(days / 8));
+  for (let i = 0; i < points.length; i += labelStep) {
+    const d = fromISO(points[i].iso);
+    const label = days > 60
+      ? `${MONTH_SHORT[d.getMonth()]}`
+      : `${d.getDate()}.${String(d.getMonth()+1).padStart(2,'0')}`;
+    ctx.fillText(label, xOf(i), padT + plotH + 8);
+  }
+
+  const segments = [];
+  let current = [];
+  points.forEach((p, i) => {
+    if (p.value == null) {
+      if (current.length) { segments.push(current); current = []; }
+    } else {
+      current.push({ x: xOf(i), y: yOf(p.value), v: p.value, state: p.state, i });
+    }
+  });
+  if (current.length) segments.push(current);
+
+  segments.forEach(seg => {
+    if (seg.length === 1) {
+      drawPoint(ctx, seg[0].x, seg[0].y, seg[0].state, { colOk, colWarn, colBad });
+      return;
+    }
+    ctx.save();
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(seg[0].x, seg[0].y);
+    for (let i = 0; i < seg.length - 1; i++) {
+      const p0 = seg[i - 1] || seg[i];
+      const p1 = seg[i];
+      const p2 = seg[i + 1];
+      const p3 = seg[i + 2] || p2;
+      const cp1x = p1.x + (p2.x - p0.x) / 6;
+      const cp1y = p1.y + (p2.y - p0.y) / 6;
+      const cp2x = p2.x - (p3.x - p1.x) / 6;
+      const cp2y = p2.y - (p3.y - p1.y) / 6;
+      ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+    }
+    const grad = ctx.createLinearGradient(0, yOf(1), 0, yOf(-1));
+    grad.addColorStop(0, colWarn);
+    grad.addColorStop(0.5, colOk);
+    grad.addColorStop(1, colBad);
+    ctx.strokeStyle = grad;
+    ctx.stroke();
+    ctx.restore();
+    seg.forEach(p => drawPoint(ctx, p.x, p.y, p.state, { colOk, colWarn, colBad }));
+  });
+}
+
+function drawPoint(ctx, x, y, state, colors) {
+  let c = colors.colOk;
+  if (state === 'up')   c = colors.colWarn;
+  if (state === 'down') c = colors.colBad;
+  ctx.fillStyle = c;
+  ctx.beginPath();
+  ctx.arc(x, y, 3.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--panel').trim();
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+}
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (document.getElementById('view-health').classList.contains('active')) {
+      drawHealthChart();
+    }
+  }, 120);
+});
+
+/* ============================================================
+   ЭКСПОРТ / ИМПОРТ
+   ============================================================ */
+function exportData() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `hobbies-backup-${todayISO()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!confirm('Импорт заменит текущие данные. Продолжить?')) return;
+      state = { ...structuredClone(DEFAULT_STATE), ...data };
+      if (!state.activeSection) state.activeSection = { dj: 'tasks', code: 'tasks' };
+      saveState();
+      renderAll();
+    } catch (err) {
+      alert('Ошибка чтения файла: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+/* ============================================================
+   УТИЛИТЫ
+   ============================================================ */
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+/* ============================================================
+   СТАРТ
+   ============================================================ */
+function renderAll() {
+  renderKanban();
+  renderCalendar();
+  renderHobbies();
+  renderHealth();
+  drawHealthChart();
+}
+applyTheme(theme);
+renderAll();
+</script>
+</body>
+</html>
