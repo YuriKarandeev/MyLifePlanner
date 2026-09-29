@@ -22,6 +22,8 @@
     --ok: #22a55a;
     --warn: #e08a00;
     --bad: #e0455f;
+    --ok-soft: #6fc98a;
+    --bad-soft: #e88093;
     --shadow: 0 1px 3px rgba(0,0,0,.06);
     --radius: 10px;
     --safe-top: env(safe-area-inset-top, 0px);
@@ -40,6 +42,8 @@
     --ok: #3ddc84;
     --warn: #ffb020;
     --bad: #ff5c7c;
+    --ok-soft: #7fe5a4;
+    --bad-soft: #ff8fa3;
     --shadow: 0 1px 3px rgba(0,0,0,.3);
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -162,7 +166,6 @@
   }
   input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 
-  /* Sync indicator */
   .sync-badge {
     display: inline-flex;
     align-items: center;
@@ -185,7 +188,7 @@
   .sync-badge.offline .dot { background: var(--bad); }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
 
-  /* ===== KANBAN ===== */
+  /* KANBAN */
   .kanban {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -286,7 +289,7 @@
   .card .del-btn:hover { color: var(--bad); border-color: var(--bad); }
   .column.drag-over { border-color: var(--accent); background: rgba(108,140,255,.06); }
 
-  /* ===== CALENDAR ===== */
+  /* CALENDAR */
   .cal-head {
     display: flex;
     gap: 8px;
@@ -343,7 +346,7 @@
   .cal-task.code { border-left-color: var(--code); }
   .cal-task.done { text-decoration: line-through; opacity: .6; }
 
-  /* ===== HOBBIES ===== */
+  /* HOBBIES */
   .subtabs {
     display: flex;
     gap: 6px;
@@ -459,7 +462,7 @@
   }
   .stub .big { font-size: 34px; margin-bottom: 10px; }
 
-  /* ===== HEALTH ===== */
+  /* HEALTH */
   .health-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -474,7 +477,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    min-height: 240px;
+    min-height: 290px;
     box-shadow: var(--shadow);
   }
   .day-card.today { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
@@ -487,9 +490,9 @@
     text-transform: uppercase;
     letter-spacing: .5px;
   }
-  .state-btns { display: flex; flex-direction: column; gap: 5px; }
+  .state-btns { display: flex; flex-direction: column; gap: 4px; }
   .state-btn {
-    padding: 9px;
+    padding: 8px 6px;
     border-radius: 7px;
     border: 1px solid var(--border);
     background: var(--panel-2);
@@ -499,11 +502,14 @@
     text-align: center;
     transition: .15s;
     user-select: none;
+    line-height: 1.2;
   }
   .state-btn:hover { color: var(--text); }
-  .state-btn.active[data-state=ok]   { background: rgba(34,165,90,.15); color: var(--ok);   border-color: var(--ok); }
-  .state-btn.active[data-state=down] { background: rgba(224,69,95,.15); color: var(--bad);  border-color: var(--bad); }
-  .state-btn.active[data-state=up]   { background: rgba(224,138,0,.15); color: var(--warn); border-color: var(--warn); }
+  .state-btn.active[data-state=strongUp]   { background: rgba(224,138,0,.18); color: var(--warn);     border-color: var(--warn); }
+  .state-btn.active[data-state=up]         { background: rgba(111,201,138,.15); color: var(--ok-soft);  border-color: var(--ok-soft); }
+  .state-btn.active[data-state=ok]         { background: rgba(34,165,90,.15); color: var(--ok);        border-color: var(--ok); }
+  .state-btn.active[data-state=down]       { background: rgba(232,128,147,.15); color: var(--bad-soft); border-color: var(--bad-soft); }
+  .state-btn.active[data-state=strongDown] { background: rgba(224,69,95,.18); color: var(--bad);       border-color: var(--bad); }
   .meds {
     display: flex;
     flex-direction: column;
@@ -521,7 +527,7 @@
   }
   .med-row .checkbox { width: 24px; height: 24px; font-size: 13px; }
 
-  /* ===== CHART ===== */
+  /* CHART */
   .chart-panel {
     background: var(--panel);
     border: 1px solid var(--border);
@@ -580,7 +586,7 @@
   }
   .header-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 
-  /* ===== MODAL ===== */
+  /* MODAL */
   .modal-overlay {
     position: fixed;
     inset: 0;
@@ -605,7 +611,6 @@
   .modal input { width: 100%; margin-bottom: 14px; }
   .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
 
-  /* Loading overlay */
   .loading-overlay {
     position: fixed;
     inset: 0;
@@ -628,7 +633,6 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* =========== АДАПТАЦИЯ =========== */
   @media (max-width: 900px) {
     .kanban {
       grid-template-columns: repeat(4, 260px);
@@ -658,8 +662,9 @@
     .kanban { grid-template-columns: repeat(4, 82vw); gap: 10px; }
     .column { min-height: 160px; padding: 10px; }
     .card { cursor: default; }
-    .health-grid { grid-template-columns: repeat(7, 70vw); gap: 10px; }
-    .day-card { min-height: 260px; }
+    .health-grid { grid-template-columns: repeat(7, 74vw); gap: 10px; }
+    .day-card { min-height: 320px; }
+    .state-btn { font-size: 13px; padding: 10px 8px; }
     .cal-grid { gap: 4px; }
     .cal-cell { min-height: 64px; padding: 4px; font-size: 10px; }
     .cal-cell .daynum { font-size: 10px; margin-bottom: 3px; }
@@ -703,7 +708,7 @@
   }
   @media (max-width: 380px) {
     .kanban { grid-template-columns: repeat(4, 88vw); }
-    .health-grid { grid-template-columns: repeat(7, 78vw); }
+    .health-grid { grid-template-columns: repeat(7, 82vw); }
   }
 </style>
 </head>
@@ -739,7 +744,7 @@
 <main>
   <section class="view" id="view-kanban">
     <div style="margin-bottom:14px;">
-      <button onclick="addKanbanCard()">+ Карточка (только Канбан)</button>
+      <button onclick="window.addKanbanCard()">+ Карточка (только Канбан)</button>
     </div>
     <div class="kanban" id="kanban"></div>
   </section>
@@ -751,9 +756,9 @@
         <button data-range="month">Месяц</button>
         <button data-range="year">Год</button>
       </div>
-      <button class="ghost mini" onclick="calShift(-1)">←</button>
-      <button class="ghost mini" onclick="calToday()">Сегодня</button>
-      <button class="ghost mini" onclick="calShift(1)">→</button>
+      <button class="ghost mini" onclick="window.calShift(-1)">←</button>
+      <button class="ghost mini" onclick="window.calToday()">Сегодня</button>
+      <button class="ghost mini" onclick="window.calShift(1)">→</button>
       <div class="spacer" style="flex:1"></div>
       <span id="calTitle" style="color:var(--muted); font-size:12px;"></span>
     </div>
@@ -785,9 +790,10 @@
       </div>
       <div class="chart-legend">
         <span><span class="dot" style="background:var(--warn)"></span>Подъём</span>
+        <span><span class="dot" style="background:var(--ok-soft)"></span>Лёгкий +</span>
         <span><span class="dot" style="background:var(--ok)"></span>Норма</span>
+        <span><span class="dot" style="background:var(--bad-soft)"></span>Лёгкий −</span>
         <span><span class="dot" style="background:var(--bad)"></span>Спад</span>
-        <span style="color:var(--muted)">· пусто = нет записи</span>
       </div>
     </div>
   </section>
@@ -798,22 +804,19 @@
     <h3 id="linkModalTitle">Вставить ссылку</h3>
     <input type="text" id="linkModalInput" placeholder="https://..." autocomplete="off">
     <div class="modal-actions">
-      <button class="ghost" onclick="closeLinkModal()">Отмена</button>
-      <button onclick="saveLinkModal()">Сохранить</button>
+      <button class="ghost" onclick="window.closeLinkModal()">Отмена</button>
+      <button onclick="window.saveLinkModal()">Сохранить</button>
     </div>
   </div>
 </div>
 
-<!-- ============================================================
-     FIREBASE + ПРИЛОЖЕНИЕ
-     ============================================================ -->
 <script type="module">
 /* ============================================================
-   FIREBASE CONFIG
+   FIREBASE
    ============================================================ */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
-  getFirestore, doc, getDoc, setDoc, onSnapshot,
+  getFirestore, doc, setDoc, onSnapshot,
   enableIndexedDbPersistence
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
@@ -829,23 +832,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Включаем офлайн-кэш (работает без интернета)
 enableIndexedDbPersistence(db).catch(err => {
-  if (err.code === 'failed-precondition') {
-    console.warn('Firestore persistence: несколько вкладок открыто');
-  } else if (err.code === 'unimplemented') {
-    console.warn('Firestore persistence: браузер не поддерживает');
-  }
+  if (err.code === 'failed-precondition') console.warn('Firestore: несколько вкладок');
+  else if (err.code === 'unimplemented') console.warn('Firestore: не поддерживается');
 });
 
-// Ключ документа — «секретный ID». Если хочешь, можешь поменять на свой.
 const USER_ID = 'yuri-main';
-const DOC_PATH = ['users', USER_ID];
+const DOC_PATH = ['userdata', USER_ID];
 
 /* ============================================================
    СОСТОЯНИЕ
    ============================================================ */
-const STORAGE_KEY = 'hobbies_health_mvp_v2';
+const STORAGE_KEY = 'hobbies_health_mvp_v3';
 const THEME_KEY = 'hobbies_health_theme_v2';
 
 const DEFAULT_STATE = {
@@ -878,11 +876,8 @@ function loadLocal() {
   }
 }
 
-function saveLocal() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-}
+function saveLocal() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 
-// Сохранение: локально сразу, в облако — с небольшой задержкой (чтобы не спамить)
 function saveState() {
   saveLocal();
   if (!cloudReady) return;
@@ -901,9 +896,6 @@ function saveState() {
 
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
 
-/* ============================================================
-   SYNC СТАТУС
-   ============================================================ */
 function setSyncStatus(status, text) {
   const badge = document.getElementById('syncBadge');
   const textEl = document.getElementById('syncText');
@@ -914,15 +906,14 @@ function setSyncStatus(status, text) {
 }
 
 /* ============================================================
-   FIREBASE: загрузка и real-time синхронизация
+   FIREBASE SYNC
    ============================================================ */
 const docRef = doc(db, ...DOC_PATH);
 
-onSnapshot(docRef, { includeMetadataChanges: false }, snapshot => {
+onSnapshot(docRef, snapshot => {
   const loading = document.getElementById('loadingOverlay');
   if (snapshot.exists()) {
     const cloudData = snapshot.data();
-    // Объединяем с дефолтом (если структура обновилась)
     state = { ...structuredClone(DEFAULT_STATE), ...cloudData };
     if (!state.activeSection) state.activeSection = { dj: 'tasks', code: 'tasks' };
     if (!state.works) state.works = [];
@@ -932,14 +923,9 @@ onSnapshot(docRef, { includeMetadataChanges: false }, snapshot => {
     setSyncStatus('online', 'Синхронизировано');
     renderAll();
   } else {
-    // Первый запуск — документа нет. Загружаем локальное состояние в облако.
     cloudReady = true;
-    setDoc(docRef, state).then(() => {
-      setSyncStatus('online', 'Создано');
-    }).catch(e => {
-      console.error('Ошибка создания документа:', e);
-      setSyncStatus('offline', 'Офлайн');
-    });
+    setDoc(docRef, state).then(() => setSyncStatus('online', 'Создано'))
+      .catch(e => { console.error(e); setSyncStatus('offline', 'Офлайн'); });
     renderAll();
   }
   if (loading) loading.classList.add('hidden');
@@ -984,9 +970,7 @@ function applyTheme(t) {
   });
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) meta.setAttribute('content', t === 'dark' ? '#0f1117' : '#f5f6fa');
-  if (document.getElementById('view-health').classList.contains('active')) {
-    drawHealthChart();
-  }
+  if (document.getElementById('view-health').classList.contains('active')) drawHealthChart();
 }
 document.querySelectorAll('#themeToggle .opt').forEach(o => {
   o.addEventListener('click', () => applyTheme(o.dataset.theme));
@@ -1076,10 +1060,8 @@ function renderCard(card, colIdx) {
     metaHtml += `<span class="badge">Канбан</span>`;
   }
   if (deadline) metaHtml += `<span>до ${formatRu(deadline)}</span>`;
-
   const canLeft = colIdx > 0;
   const canRight = colIdx < COLUMNS.length - 1;
-
   el.innerHTML = `
     <div class="title" style="${isDone ? 'text-decoration:line-through;opacity:.6' : ''}">${escapeHtml(card.title)}</div>
     <div class="meta">${metaHtml}</div>
@@ -1091,7 +1073,6 @@ function renderCard(card, colIdx) {
       <button class="del-btn" title="Удалить" onclick="window.deleteCard('${card.id}')">🗑</button>
     </div>
   `;
-
   el.addEventListener('dragstart', e => {
     if (e.dataTransfer) e.dataTransfer.setData('text/plain', card.id);
     el.classList.add('dragging');
@@ -1192,17 +1173,12 @@ function renderHobbies() {
   });
   const body = document.getElementById('sectionBody');
   body.innerHTML = '';
-  if (activeSec === 'tasks') {
-    renderTasksSection(body);
-  } else if (activeSec === 'learning' || activeSec === 'collection') {
+  if (activeSec === 'tasks') renderTasksSection(body);
+  else if (activeSec === 'learning' || activeSec === 'collection') {
     renderStub(body, activeSec === 'learning' ? 'Дорожная карта обучения' : 'Музыкальная коллекция');
-  } else if (activeSec === 'works') {
-    renderWorksSection(body);
-  } else if (activeSec === 'inProgress') {
-    renderProgramsSection(body, false);
-  } else if (activeSec === 'finished') {
-    renderProgramsSection(body, true);
-  }
+  } else if (activeSec === 'works') renderWorksSection(body);
+  else if (activeSec === 'inProgress') renderProgramsSection(body, false);
+  else if (activeSec === 'finished') renderProgramsSection(body, true);
 }
 
 function renderTasksSection(container) {
@@ -1230,8 +1206,7 @@ function renderTasksSection(container) {
     tbody.innerHTML = `<tr><td colspan="4"><div class="empty">Пока нет задач. Добавь первую!</div></td></tr>`;
     return;
   }
-  tasks
-    .sort((a, b) => (a.deadline || '9999').localeCompare(b.deadline || '9999'))
+  tasks.sort((a, b) => (a.deadline || '9999').localeCompare(b.deadline || '9999'))
     .forEach(task => {
       const tr = document.createElement('tr');
       if (task.done) tr.classList.add('row-done');
@@ -1579,14 +1554,16 @@ function buildDayCell(iso, today, map, other = false) {
 }
 
 /* ============================================================
-   ЗДОРОВЬЕ
+   ЗДОРОВЬЕ — 5 СОСТОЯНИЙ
    ============================================================ */
 const HEALTH_STATES = [
-  { id: 'ok',   label: 'Нормально' },
-  { id: 'down', label: 'Спад' },
-  { id: 'up',   label: 'Подъём' }
+  { id: 'strongUp', label: '⬆ Подъём' },
+  { id: 'up',       label: '↗ Лёгкий +' },
+  { id: 'ok',       label: '● Норма' },
+  { id: 'down',     label: '↘ Лёгкий −' },
+  { id: 'strongDown', label: '⬇ Спад' }
 ];
-const STATE_VALUE = { down: -1, ok: 0, up: 1 };
+const STATE_VALUE = { strongDown: -2, down: -1, ok: 0, up: 1, strongUp: 2 };
 
 function renderHealth() {
   const grid = document.getElementById('healthGrid');
@@ -1627,9 +1604,7 @@ function renderHealth() {
   if (window.matchMedia('(max-width: 900px)').matches) {
     requestAnimationFrame(() => {
       const todayCard = grid.querySelector('.day-card.today');
-      if (todayCard) {
-        todayCard.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'auto' });
-      }
+      if (todayCard) todayCard.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'auto' });
     });
   }
 }
@@ -1676,7 +1651,7 @@ function drawHealthChart() {
   const dpr = window.devicePixelRatio || 1;
   const cssWidth = wrap.clientWidth;
   const isMobile = window.matchMedia('(max-width: 640px)').matches;
-  const cssHeight = isMobile ? 200 : 240;
+  const cssHeight = isMobile ? 220 : 260;
   canvas.width = cssWidth * dpr;
   canvas.height = cssHeight * dpr;
   canvas.style.width = cssWidth + 'px';
@@ -1690,8 +1665,10 @@ function drawHealthChart() {
   const colBorder = cs.getPropertyValue('--border').trim();
   const colMuted  = cs.getPropertyValue('--muted').trim();
   const colOk     = cs.getPropertyValue('--ok').trim();
+  const colOkSoft = cs.getPropertyValue('--ok-soft').trim();
   const colWarn   = cs.getPropertyValue('--warn').trim();
   const colBad    = cs.getPropertyValue('--bad').trim();
+  const colBadSoft = cs.getPropertyValue('--bad-soft').trim();
 
   const days = getChartDays();
   const today = todayISO();
@@ -1701,27 +1678,32 @@ function drawHealthChart() {
   for (let i = 0; i < days; i++) {
     const iso = addDays(start, i);
     const rec = state.health[iso];
-    points.push({
-      iso,
-      value: rec && rec.state != null ? STATE_VALUE[rec.state] : null,
-      state: rec?.state || null
-    });
+    let val = null;
+    if (rec && rec.state != null) {
+      // поддержка старых ключей up/down как ±1 (совместимость)
+      if (rec.state === 'up' || rec.state === 'down' || rec.state === 'ok' ||
+          rec.state === 'strongUp' || rec.state === 'strongDown') {
+        val = STATE_VALUE[rec.state];
+      }
+    }
+    points.push({ iso, value: val, state: rec?.state || null });
   }
 
-  const padL = isMobile ? 32 : 44;
+  const padL = isMobile ? 34 : 46;
   const padR = 12;
-  const padT = 18;
+  const padT = 20;
   const padB = isMobile ? 26 : 32;
   const plotW = cssWidth - padL - padR;
   const plotH = cssHeight - padT - padB;
 
   const xOf = i => padL + (points.length === 1 ? plotW / 2 : (i / (points.length - 1)) * plotW);
-  const yOf = v => padT + plotH / 2 - (v / 1.4) * (plotH / 2);
+  // ось Y: -2 ... +2 → сверху +2, снизу -2
+  const yOf = v => padT + plotH / 2 - (v / 2.4) * (plotH / 2);
 
   ctx.strokeStyle = colBorder;
   ctx.lineWidth = 1;
   ctx.setLineDash([3, 4]);
-  [1, 0, -1].forEach(v => {
+  [2, 1, 0, -1, -2].forEach(v => {
     const y = yOf(v);
     ctx.beginPath();
     ctx.moveTo(padL, y);
@@ -1734,9 +1716,11 @@ function drawHealthChart() {
   ctx.font = isMobile ? '10px -apple-system, sans-serif' : '11px -apple-system, sans-serif';
   ctx.textAlign = 'right';
   ctx.textBaseline = 'middle';
-  ctx.fillText('▲', padL - 8, yOf(1));
-  ctx.fillText('=', padL - 8, yOf(0));
-  ctx.fillText('▼', padL - 8, yOf(-1));
+  ctx.fillText('⬆', padL - 8, yOf(2));
+  ctx.fillText('↗', padL - 8, yOf(1));
+  ctx.fillText('●', padL - 8, yOf(0));
+  ctx.fillText('↘', padL - 8, yOf(-1));
+  ctx.fillText('⬇', padL - 8, yOf(-2));
 
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
@@ -1762,7 +1746,7 @@ function drawHealthChart() {
 
   segments.forEach(seg => {
     if (seg.length === 1) {
-      drawPoint(ctx, seg[0].x, seg[0].y, seg[0].state, { colOk, colWarn, colBad }, isMobile);
+      drawPoint(ctx, seg[0].x, seg[0].y, seg[0].state, { colOk, colWarn, colBad, colOkSoft, colBadSoft }, isMobile);
       return;
     }
     ctx.save();
@@ -1782,24 +1766,29 @@ function drawHealthChart() {
       const cp2y = p2.y - (p3.y - p1.y) / 6;
       ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
     }
-    const grad = ctx.createLinearGradient(0, yOf(1), 0, yOf(-1));
+    const grad = ctx.createLinearGradient(0, yOf(2), 0, yOf(-2));
     grad.addColorStop(0, colWarn);
+    grad.addColorStop(0.25, colOkSoft);
     grad.addColorStop(0.5, colOk);
+    grad.addColorStop(0.75, colBadSoft);
     grad.addColorStop(1, colBad);
     ctx.strokeStyle = grad;
     ctx.stroke();
     ctx.restore();
-    seg.forEach(p => drawPoint(ctx, p.x, p.y, p.state, { colOk, colWarn, colBad }, isMobile));
+    seg.forEach(p => drawPoint(ctx, p.x, p.y, p.state, { colOk, colWarn, colBad, colOkSoft, colBadSoft }, isMobile));
   });
 }
 
 function drawPoint(ctx, x, y, state, colors, isMobile) {
   let c = colors.colOk;
-  if (state === 'up')   c = colors.colWarn;
-  if (state === 'down') c = colors.colBad;
+  if (state === 'strongUp') c = colors.colWarn;
+  else if (state === 'up') c = colors.colOkSoft;
+  else if (state === 'ok') c = colors.colOk;
+  else if (state === 'down') c = colors.colBadSoft;
+  else if (state === 'strongDown') c = colors.colBad;
   ctx.fillStyle = c;
   ctx.beginPath();
-  ctx.arc(x, y, isMobile ? 2.6 : 3.2, 0, Math.PI * 2);
+  ctx.arc(x, y, isMobile ? 2.8 : 3.4, 0, Math.PI * 2);
   ctx.fill();
   ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--panel').trim();
   ctx.lineWidth = 1.5;
@@ -1810,9 +1799,7 @@ let resizeTimer;
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
-    if (document.getElementById('view-health').classList.contains('active')) {
-      drawHealthChart();
-    }
+    if (document.getElementById('view-health').classList.contains('active')) drawHealthChart();
   }, 150);
 });
 
@@ -1825,9 +1812,6 @@ function escapeHtml(s) {
   }[c]));
 }
 
-/* ============================================================
-   РЕНДЕР
-   ============================================================ */
 function renderAll() {
   renderKanban();
   renderCalendar();
@@ -1837,7 +1821,7 @@ function renderAll() {
 }
 
 /* ============================================================
-   ЭКСПОРТ В ГЛОБАЛЬНУЮ ОБЛАСТЬ (для onclick в HTML)
+   ЭКСПОРТ В ГЛОБАЛЬНУЮ ОБЛАСТЬ
    ============================================================ */
 window.moveCardBy = moveCardBy;
 window.deleteCard = deleteCard;
@@ -1862,7 +1846,6 @@ window.calToday = calToday;
    СТАРТ
    ============================================================ */
 applyTheme(theme);
-// Первый рендер — из локального кэша, пока идёт загрузка из Firebase
 renderAll();
 setSyncStatus('syncing', 'Подключаюсь...');
 </script>
